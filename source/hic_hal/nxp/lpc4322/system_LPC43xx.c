@@ -924,9 +924,6 @@ void SystemInit (void) {
   /* Disable SysTick timer                                                    */
   SysTick->CTRL &= ~(SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk);
 
-  /* Set vector table pointer */
-  SCB->VTOR = ((uint32_t)(&__Vectors)) & 0xFFF00000UL;
-
   /* Configure PLL0 and PLL1, connect CPU clock to selected clock source */
   SetClock();
 
