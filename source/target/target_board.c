@@ -28,9 +28,11 @@ __WEAK
 const board_info_t g_board_info = {
 		.info_version = kBoardInfoVersion,
 		.board_id = "0000",
+#ifdef DRAG_N_DROP_SUPPORT
 		.daplink_url_name =       "MBED    HTM",
 		.daplink_drive_name = 		"DAPLINK    ",
 		.daplink_target_url = "https://mbed.org/device/?code=@U?version=@V?target_id=@T",
+#endif
 };
 
 // Disable optimization of these functions.

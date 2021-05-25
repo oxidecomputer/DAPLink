@@ -27,9 +27,11 @@ const board_info_t g_board_info = {
     .board_id = "0236",
     .family_id = kNXP_LPC55xx_FamilyID,
     .flags = kEnablePageErase,
+#ifdef DRAG_N_DROP_SUPPORT
     .daplink_url_name =       "PRODINFOHTM",
     .daplink_drive_name =       "LPC55S69",
     .daplink_target_url = "https://os.mbed.com/platforms/LPCXpresso55S69/",
+#endif
     .target_cfg = &target_device,
 };
 

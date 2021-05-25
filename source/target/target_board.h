@@ -25,7 +25,9 @@
 #include <stdint.h>
 #include "target_config.h"
 #include "target_family.h"
+#ifdef DRAG_N_DROP_SUPPORT
 #include "virtual_fs.h"
+#endif
 
 //! @brief Current board info version.
 //!
@@ -64,9 +66,11 @@ typedef struct board_info {
 
     //! @name MSD customization
     //@{
+#ifdef DRAG_N_DROP_SUPPORT
     vfs_filename_t daplink_url_name;    /*!< Customize the URL file name */
     vfs_filename_t daplink_drive_name;  /*!< Customize the MSD DAPLink drive name */
     char daplink_target_url[64];        /*!< Customize the target url in DETAILS.TXT */
+#endif
     //@}
 
     //! @name Board initialization customization
@@ -98,6 +102,7 @@ uint16_t get_family_id(void);
 //! @brief Whether the board has a valid flash algo.
 uint8_t flash_algo_valid(void);
 
+#ifdef DRAG_N_DROP_SUPPORT
 //! @brief Returns the MSD HTML help filename or a default.
 static inline const char * get_daplink_url_name ( void ) { return ((g_board_info.daplink_url_name[0] != 0) ? g_board_info.daplink_url_name : "MBED    HTM"); }
 
@@ -106,6 +111,7 @@ static inline const char * get_daplink_drive_name ( void ) { return ((g_board_in
 
 //! @brief Returns the target information URL or a default.
 static inline const char * get_daplink_target_url ( void ) { return ((g_board_info.daplink_target_url[0] != 0) ? g_board_info.daplink_target_url : "https://mbed.org/device/?code=@U?version=@V?target_id=@T"); }
+#endif
 
 #ifdef __cplusplus
 }

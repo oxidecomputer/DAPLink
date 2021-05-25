@@ -36,7 +36,9 @@
 #include "uart.h"
 #include "settings.h"
 #include "target_family.h"
+#ifdef DRAG_N_DROP_SUPPORT
 #include "flash_manager.h"
+#endif
 #include <string.h>
 
 
@@ -161,7 +163,6 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         num += ((write_len + 1) << 16) | 1;
         break;
     }
-#endif
     case ID_DAP_Vendor13: {
         // switching between chip erase and page erase
         //              COMMAND(OUT Packet)
@@ -181,6 +182,7 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         num += (1U << 16) | 1U; // increment request and response count each by 1
         break;
     }
+#endif
     case ID_DAP_Vendor14: break;
     case ID_DAP_Vendor15: break;
     case ID_DAP_Vendor16: break;
