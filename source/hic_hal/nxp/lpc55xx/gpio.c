@@ -34,6 +34,7 @@ __WEAK void board_gpio_init(void)
     // Nothing by default
 }
 
+// Note: other gpio config happens in DAP_config
 void gpio_init(void)
 {
     // Enable hardfault on unaligned access for the interface only.
@@ -69,14 +70,6 @@ void gpio_init(void)
 
     // Set LED to output.
     GPIO->DIRSET[LED_A_PORT] = LED_A_MASK;
-
-    // Turn on LED.
-    GPIO->B[LED_A_PORT][LED_A_PIN] = 0;
-
-    // Setup VREF control
-    IOCON->PIO[PIN_VREF_CTRL_PORT][PIN_VREF_CTRL] = IOCON_FUNC0 | IOCON_DIGITAL_EN;
-    GPIO->DIRSET[PIN_VREF_CTRL_PORT] = PIN_VREF_CTRL_MASK;
-    GPIO->B[PIN_VREF_CTRL_PORT][PIN_VREF_CTRL] = 1;
 
     board_gpio_init();
 }

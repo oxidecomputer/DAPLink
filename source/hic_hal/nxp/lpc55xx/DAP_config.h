@@ -579,11 +579,14 @@ __STATIC_INLINE void DAP_SETUP(void)
     // Configure GPIO outputs.
     GPIO->CLR[PIN_PIO_PORT] = PIN_TMS_SWDIO_TXEN_MASK   // Disable TMS/SWDIO drive.
                                 | PIN_RESET_TXEN_MASK;  // Disable RESET drive.
+    GPIO->SET[PIN_PIO_PORT] = PIN_DETECT_MASK; // Don't assert detect at start
+    GPIO->SET[PIN_VREF_CTRL_PORT] = PIN_VREF_CTRL_MASK; // Disable VREF.
 
     // Set GPIO directions.
     GPIO->DIRSET[PIN_PIO_PORT] = PIN_TMS_SWDIO_TXEN_MASK
                                     | PIN_RESET_TXEN_MASK
                                     | PIN_DETECT_MASK;
+    GPIO->DIRSET[PIN_VREF_CTRL_PORT] = PIN_VREF_CTRL_MASK;
     GPIO->DIRCLR[PIN_PIO_PORT] = PIN_TCK_SWCLK_MASK
                                     | PIN_TMS_SWDIO_MASK
                                     | PIN_TDO_SWO_MASK
