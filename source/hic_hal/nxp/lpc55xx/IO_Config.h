@@ -118,6 +118,12 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 #define LED_A_PIN               (5U)
 #define LED_A_MASK              (1U << LED_A_PIN)
 
+// Oxide customization
+#define PIN_VREF_CTRL_PORT      (1U)
+#define PIN_VREF_CTRL           (3U)
+#define PIN_VREF_CTRL_MASK      (1U << PIN_VREF_CTRL)
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Additional configuration for MCU-LINK-PRO support
 //////////////////////////////////////////////////////////////////////////////////////////////////

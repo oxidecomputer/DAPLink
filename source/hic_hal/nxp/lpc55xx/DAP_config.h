@@ -205,6 +205,9 @@ __STATIC_INLINE void PORT_JTAG_SETUP(void)
 
     // Enable TMS translator output.
     GPIO->B[PIN_PIO_PORT][PIN_TMS_SWDIO_TXEN] = 1;
+
+    // Allow vref in
+    GPIO->B[PIN_VREF_CTRL_PORT][PIN_VREF_CTRL] = 0;
 }
 
 /** Setup SWD I/O pins: SWCLK, SWDIO, and nRESET.
@@ -231,6 +234,13 @@ __STATIC_INLINE void PORT_SWD_SETUP(void)
 
     // Switch TDO_SWO to Flexcomm (SWO)
     IOCON->PIO[PIN_PIO_PORT][PIN_TDO_SWO] = IOCON_FUNC1 | IOCON_DIGITAL_EN;
+
+    // Turn on LED.
+    GPIO->B[LED_A_PORT][LED_A_PIN] = 0;
+
+    // Allow vref in
+    GPIO->B[PIN_VREF_CTRL_PORT][PIN_VREF_CTRL] = 0;
+
 }
 
 /** Disable JTAG/SWD I/O Pins.
@@ -251,6 +261,12 @@ __STATIC_INLINE void PORT_OFF(void)
 
     // Release DETECT.
     GPIO->B[PIN_PIO_PORT][PIN_DETECT] = 1;
+
+    // Pull voltage reference to zero
+    GPIO->B[PIN_VREF_CTRL_PORT][PIN_VREF_CTRL] = 1;
+
+    // Turn off LED.
+    GPIO->B[LED_A_PORT][LED_A_PIN] = 1;
 }
 
 
@@ -552,6 +568,9 @@ __STATIC_INLINE void DAP_SETUP(void)
                                                                             | IOCON_MODE_PULLUP
                                                                             | IOCON_DIGITAL_EN
                                                                             | IOCON_OPENDRAIN_EN
+                                                                            },
+        {   .port = PIN_VREF_CTRL_PORT,   .pin = PIN_VREF_CTRL,       .modefunc = IOCON_FUNC0
+                                                                            | IOCON_DIGITAL_EN
                                                                             },
     };
 

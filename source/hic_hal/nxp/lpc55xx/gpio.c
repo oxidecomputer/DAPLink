@@ -45,13 +45,15 @@ void gpio_init(void)
 
     // Ensure clocks are enabled.
     SYSCON->AHBCLKCTRLSET[0] = SYSCON_AHBCLKCTRL0_IOCON_MASK
-                                | SYSCON_AHBCLKCTRL0_GPIO0_MASK;
+                                | SYSCON_AHBCLKCTRL0_GPIO0_MASK
+                                | SYSCON_AHBCLKCTRL0_GPIO1_MASK;
     SYSCON->AHBCLKCTRLSET[1] = SYSCON_AHBCLKCTRL1_FC0_MASK
                                 | SYSCON_AHBCLKCTRL1_FC3_MASK;
 
     // Reset peripherals.
     RESET_PeripheralReset(kIOCON_RST_SHIFT_RSTn);
     RESET_PeripheralReset(kGPIO0_RST_SHIFT_RSTn);
+    RESET_PeripheralReset(kGPIO1_RST_SHIFT_RSTn);
     RESET_PeripheralReset(kFC0_RST_SHIFT_RSTn);
     RESET_PeripheralReset(kFC3_RST_SHIFT_RSTn);
 
@@ -70,6 +72,11 @@ void gpio_init(void)
 
     // Turn on LED.
     GPIO->B[LED_A_PORT][LED_A_PIN] = 0;
+
+    // Setup VREF control
+    IOCON->PIO[PIN_VREF_CTRL_PORT][PIN_VREF_CTRL] = IOCON_FUNC0 | IOCON_DIGITAL_EN;
+    GPIO->DIRSET[PIN_VREF_CTRL_PORT] = PIN_VREF_CTRL_MASK;
+    GPIO->B[PIN_VREF_CTRL_PORT][PIN_VREF_CTRL] = 1;
 
     board_gpio_init();
 }
