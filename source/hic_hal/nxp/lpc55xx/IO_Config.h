@@ -64,65 +64,44 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 #define PIN_RESET               (19U)
 #define PIN_RESET_MASK          (1U << PIN_RESET)
 
-// nRESET Pin Output Enable     PIO0_13 (O)
-// (DBGIF_RESET_TXEN)
-// type I pin, combo I2C/IO
-// must set EGP to put pin in GPIO mode
-#define PIN_RESET_TXEN          (13U)
-#define PIN_RESET_TXEN_MASK     (1U << PIN_RESET_TXEN)
 
-// SWD Detect Pin               PIO0_22 (I, pullup)
-// (DBGIF_DETECT)
-#define PIN_DETECT              (22U)
-#define PIN_DETECT_MASK         (1U << PIN_DETECT)
-
-// HW Version 6 Pin             PIO0_18 (I, pullup)
-// (HW_VERS_6)
-#define PIN_HW_VERS_6           (18U)
-#define PIN_HW_VERS_6_MASK      (1U << PIN_HW_VERS_6)
-
-// HW Version 7 Pin             PIO0_27 (I, pullup)
-// (HW_VERS_7)
-#define PIN_HW_VERS_7           (27U)
-#define PIN_HW_VERS_7_MASK      (1U << PIN_HW_VERS_7)
-
-// SWD Detect Pin               PIO0_31 (A)
-// (DBGIF_VREF)
-// analog input = 1/2 target VREF
-#define PIN_VREF                (31U)
-#define PIN_VREF_MASK           (1U << PIN_VREF)
-
+// Oxide customization
 
 // UART
 
-// UART Rx Pin                  PIO0_24 (I)
+// UART Rx Pin                  PIO0_29 (I)
 // (FC0_TARGET_RXD)
 // function 1 (FC0_RXD_SDA_MOSI_DATA)
-#define PIN_UART_RX             (24U)
+#define PIN_UART_RX             (29U)
 #define PIN_UART_RX_MASK        (1U << PIN_UART_RX)
 
-// UART Tx Pin                  PIO0_25 (O)
+// UART Tx Pin                  PIO0_20 (O)
 // (FC0_TARGET_TXD)
 // function 1 (FC0_TXD_SCL_MISO_WS)
-#define PIN_UART_TX             (25U)
+#define PIN_UART_TX             (20U)
 #define PIN_UART_TX_MASK        (1U << PIN_UART_TX)
 
+#define PIN_RESET_IN_PORT          (0U)
+#define PIN_RESET_IN               (20U)
+#define PIN_RESET_IN_MASK          (1U << PIN_RESET_IN)
 
-// Debug Unit LEDs
+#define PIN_SWD_VCCIO_EN_PORT      (0U)
+#define PIN_SWD_VCCIO_EN           (24U)
+#define PIN_SWD_VCCIO_EN_MASK      (1U << PIN_SWD_VCCIO_EN)
 
-// Connected/Activity LED       PIO0_5
-// (PIO0_5-ISP_EN-LED1_CTRL)
-// active low
-// port always has pull-up and digital input (DIGIMODE) enabled (UM11126, section 15.5.1, table 312)
-#define LED_A_PORT              (0U)
-#define LED_A_PIN               (5U)
-#define LED_A_MASK              (1U << LED_A_PIN)
+#define PIN_UART_VCCIO_EN_PORT     (0U)
+#define PIN_UART_VCCIO_EN          (7U)
+#define PIN_UART_VCCIO_EN_MASK     (1U << PIN_UART_VCCIO_EN)
 
-// Oxide customization
-#define PIN_VREF_CTRL_PORT      (1U)
-#define PIN_VREF_CTRL           (3U)
-#define PIN_VREF_CTRL_MASK      (1U << PIN_VREF_CTRL)
+// active low UART status LED
+#define PIN_UART_STATUS_LED_PORT    (0U)
+#define PIN_UART_STATUS_LED         (21U)
+#define PIN_UART_STATUS_LED_MASK    (1U << PIN_UART_STATUS_LED)
 
+// active low SWD status LED
+#define PIN_SWD_STATUS_LED_PORT    (0U)
+#define PIN_SWD_STATUS_LED         (22U)
+#define PIN_SWD_STATUS_LED_MASK    (1U << PIN_SWD_STATUS_LED)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Additional configuration for MCU-LINK-PRO support

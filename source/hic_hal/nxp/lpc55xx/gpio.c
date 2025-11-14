@@ -20,94 +20,75 @@
  * limitations under the License.
  */
 
-#include "fsl_device_registers.h"
-#include "DAP_config.h"
 #include "gpio.h"
+#include "DAP_config.h"
 #include "daplink.h"
-#include "hic_init.h"
 #include "fsl_clock.h"
+#include "fsl_device_registers.h"
 #include "fsl_iocon.h"
 #include "fsl_reset.h"
+#include "hic_init.h"
 
-__WEAK void board_gpio_init(void)
-{
-    // Nothing by default
+__WEAK void board_gpio_init(void) {
+  // Nothing by default
 }
 
 // Note: other gpio config happens in DAP_config
-void gpio_init(void)
-{
-    // Enable hardfault on unaligned access for the interface only.
-    // If this is done in the bootloader than then it might (will) break
-    // older application firmware or firmware from 3rd party vendors.
+void gpio_init(void) {
+  // Enable hardfault on unaligned access for the interface only.
+  // If this is done in the bootloader than then it might (will) break
+  // older application firmware or firmware from 3rd party vendors.
 #if defined(DAPLINK_IF)
-    SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
+  SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
 #endif
 
-    // Ensure clocks are enabled.
-    SYSCON->AHBCLKCTRLSET[0] = SYSCON_AHBCLKCTRL0_IOCON_MASK
-                                | SYSCON_AHBCLKCTRL0_GPIO0_MASK
-                                | SYSCON_AHBCLKCTRL0_GPIO1_MASK;
-    SYSCON->AHBCLKCTRLSET[1] = SYSCON_AHBCLKCTRL1_FC0_MASK
-                                | SYSCON_AHBCLKCTRL1_FC3_MASK;
+  // Ensure clocks are enabled.
+  SYSCON->AHBCLKCTRLSET[0] = SYSCON_AHBCLKCTRL0_IOCON_MASK |
+                             SYSCON_AHBCLKCTRL0_GPIO0_MASK |
+                             SYSCON_AHBCLKCTRL0_GPIO1_MASK;
+  SYSCON->AHBCLKCTRLSET[1] =
+      SYSCON_AHBCLKCTRL1_FC0_MASK | SYSCON_AHBCLKCTRL1_FC3_MASK;
 
-    // Reset peripherals.
-    RESET_PeripheralReset(kIOCON_RST_SHIFT_RSTn);
-    RESET_PeripheralReset(kGPIO0_RST_SHIFT_RSTn);
-    RESET_PeripheralReset(kGPIO1_RST_SHIFT_RSTn);
-    RESET_PeripheralReset(kFC0_RST_SHIFT_RSTn);
-    RESET_PeripheralReset(kFC3_RST_SHIFT_RSTn);
+  // Reset peripherals.
+  RESET_PeripheralReset(kIOCON_RST_SHIFT_RSTn);
+  RESET_PeripheralReset(kGPIO0_RST_SHIFT_RSTn);
+  RESET_PeripheralReset(kGPIO1_RST_SHIFT_RSTn);
+  RESET_PeripheralReset(kFC0_RST_SHIFT_RSTn);
+  RESET_PeripheralReset(kFC3_RST_SHIFT_RSTn);
 
-    // Configure pins.
-    IOCON->PIO[LED_A_PORT][LED_A_PIN] = IOCON_FUNC0 | IOCON_DIGITAL_EN;
-    IOCON->PIO[PIN_PIO_PORT][PIN_RESET] = IOCON_FUNC0 | IOCON_MODE_PULLUP | IOCON_DIGITAL_EN | IOCON_OPENDRAIN_EN;
-
-    // Set RESET to input
-    GPIO->DIRCLR[PIN_PIO_PORT] = PIN_RESET_MASK;
-
-    // Turn off LED.
-    GPIO->B[LED_A_PORT][LED_A_PIN] = 1;
-
-    // Set LED to output.
-    GPIO->DIRSET[LED_A_PORT] = LED_A_MASK;
-
-    board_gpio_init();
+  board_gpio_init();
 }
 
-void gpio_set_board_power(bool powerEnabled)
-{
-    // No target power control in this circuit.
+void gpio_set_board_power(bool powerEnabled) {
+  // No target power control in this circuit.
 }
 
-__WEAK void gpio_set_leds(uint32_t leds, gpio_led_state_t state)
-{
-    // LED is active low, so set to inverse of the enum value.
-    if (leds & (LED_T_CONNECTED | LED_T_HID | LED_T_CDC | LED_T_MSC)) {
-        GPIO->B[LED_A_PORT][LED_A_PIN] = (uint8_t)((state == GPIO_LED_ON) ? 0 : 1);
-    }
+// TODO check the logic here, each field needs to be mapped to the correct LED
+__WEAK void gpio_set_leds(uint32_t leds, gpio_led_state_t state) {
+  // LED is active low, so set to inverse of the enum value.
+  if (leds & (LED_T_CONNECTED | LED_T_RUNNING | LED_T_HID | LED_T_MSC)) {
+    GPIO->B[PIN_SWD_STATUS_LED_PORT][PIN_SWD_STATUS_LED] =
+        (uint8_t)((state == GPIO_LED_ON) ? 0 : 1);
+  }
+
+  if (leds & (LED_T_CDC)) {
+    GPIO->B[PIN_UART_STATUS_LED_PORT][PIN_UART_STATUS_LED] =
+        (uint8_t)((state == GPIO_LED_ON) ? 0 : 1);
+  }
 }
 
-void gpio_set_hid_led(gpio_led_state_t state)
-{
-    gpio_set_leds(LED_T_HID, state);
+void gpio_set_hid_led(gpio_led_state_t state) {
+  gpio_set_leds(LED_T_HID, state);
 }
 
-void gpio_set_cdc_led(gpio_led_state_t state)
-{
-    gpio_set_leds(LED_T_CDC, state);
+void gpio_set_cdc_led(gpio_led_state_t state) {
+  gpio_set_leds(LED_T_CDC, state);
 }
 
-void gpio_set_msc_led(gpio_led_state_t state)
-{
-    gpio_set_leds(LED_T_MSC, state);
+void gpio_set_msc_led(gpio_led_state_t state) {
+  gpio_set_leds(LED_T_MSC, state);
 }
 
-__WEAK uint8_t gpio_get_reset_btn_no_fwrd(void)
-{
-    return PIN_nRESET_IN() ? 0 : 1;
-}
+__WEAK uint8_t gpio_get_reset_btn_no_fwrd(void) { return 0; }
 
-__WEAK uint8_t gpio_get_reset_btn_fwrd(void)
-{
-    return 0;
-}
+__WEAK uint8_t gpio_get_reset_btn_fwrd(void) { return 0; }
