@@ -204,7 +204,7 @@ __STATIC_INLINE void PORT_JTAG_SETUP(void)
     GPIO->B[PIN_PIO_PORT][PIN_TMS_SWDIO_TXEN] = 1;
 
     // Enable output buffers via VCCIO
-    // GPIO->B[PIN_SWD_VCCIO_EN_PORT][PIN_SWD_VCCIO_EN] = 1;
+    GPIO->B[PIN_SWD_VCCIO_EN_PORT][PIN_SWD_VCCIO_EN] = 1;
 }
 
 /** Setup SWD I/O pins: SWCLK, SWDIO, and nRESET.
