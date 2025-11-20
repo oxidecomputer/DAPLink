@@ -121,6 +121,9 @@ This information includes:
 /// Clock frequency of the Test Domain Timer. Timer value is returned with \ref TIMESTAMP_GET.
 #define TIMESTAMP_CLOCK         1000000U      ///< Timestamp clock in Hz (0 = timestamps not supported).
 
+// TODO setting DAP_UART breaks things but it seems to be the "right" way to
+// integrate the uart. What is going on here?
+
 /// Indicate that UART Communication Port is available.
 /// This information is returned by the command \ref DAP_Info as part of <b>Capabilities</b>.
 #define DAP_UART                0               ///< DAP UART:  1 = available, 0 = not available.
@@ -128,11 +131,15 @@ This information includes:
 /// USART Driver instance number for the UART Communication Port.
 #define DAP_UART_DRIVER         1               ///< USART Driver instance number (Driver_USART#).
 
+// TODO make the uart driver and the dap config use the same buffer size config.
+// right now they are independent and have to be synced by the developer. Right
+// now these only seem to be used by the DAP_Info command.
+
 /// UART Receive Buffer Size.
-#define DAP_UART_RX_BUFFER_SIZE 1024U           ///< Uart Receive Buffer Size in bytes (must be 2^n).
+#define DAP_UART_RX_BUFFER_SIZE 512U           ///< Uart Receive Buffer Size in bytes (must be 2^n).
 
 /// UART Transmit Buffer Size.
-#define DAP_UART_TX_BUFFER_SIZE 1024U           ///< Uart Transmit Buffer Size in bytes (must be 2^n).
+#define DAP_UART_TX_BUFFER_SIZE 512U           ///< Uart Transmit Buffer Size in bytes (must be 2^n).
 
 /// Indicate that UART Communication via USB COM Port is available.
 /// This information is returned by the command \ref DAP_Info as part of <b>Capabilities</b>.
@@ -191,6 +198,9 @@ Configures the DAP Hardware I/O pins for JTAG mode:
 */
 __STATIC_INLINE void PORT_JTAG_SETUP(void)
 {
+    // Enable output buffers via VCCIO
+    GPIO->B[PIN_SWD_VCCIO_EN_PORT][PIN_SWD_VCCIO_EN] = 1;
+
     // Set TCK, TMS, TDI GPIO outputs to high.
     GPIO->SET[PIN_PIO_PORT] = PIN_TCK_SWCLK_MASK | PIN_TMS_SWDIO_MASK | PIN_TDI_MASK;
 
@@ -203,8 +213,6 @@ __STATIC_INLINE void PORT_JTAG_SETUP(void)
     // Enable TMS translator output.
     GPIO->B[PIN_PIO_PORT][PIN_TMS_SWDIO_TXEN] = 1;
 
-    // Enable output buffers via VCCIO
-    GPIO->B[PIN_SWD_VCCIO_EN_PORT][PIN_SWD_VCCIO_EN] = 1;
 }
 
 /** Setup SWD I/O pins: SWCLK, SWDIO, and nRESET.
@@ -214,6 +222,9 @@ Configures the DAP Hardware I/O pins for Serial Wire Debug (SWD) mode:
 */
 __STATIC_INLINE void PORT_SWD_SETUP(void)
 {
+    // Enable output buffers via VCCIO
+    GPIO->B[PIN_SWD_VCCIO_EN_PORT][PIN_SWD_VCCIO_EN] = 1;
+
     // Set SWCLK and SWDIO GPIO outputs to high before enabling the translator.
     GPIO->SET[PIN_PIO_PORT] = PIN_TCK_SWCLK_MASK | PIN_TMS_SWDIO_MASK;
 
@@ -221,16 +232,14 @@ __STATIC_INLINE void PORT_SWD_SETUP(void)
     GPIO->DIRSET[PIN_PIO_PORT] = PIN_TCK_SWCLK_MASK | PIN_TMS_SWDIO_MASK;
 
     // Set TDI to input.
-    GPIO->DIRCLR[PIN_PIO_PORT] = PIN_TDI_MASK;
+    // this needs to be output to ensure its driven to a known value
+    //GPIO->DIRCLR[PIN_PIO_PORT] = PIN_TDI_MASK;
 
     // Enable SWDIO translator output.
     GPIO->B[PIN_PIO_PORT][PIN_TMS_SWDIO_TXEN] = 1;
 
     // Switch TDO_SWO to Flexcomm (SWO)
     IOCON->PIO[PIN_PIO_PORT][PIN_TDO_SWO] = IOCON_FUNC1 | IOCON_DIGITAL_EN;
-
-    // Enable output buffers via VCCIO
-    GPIO->B[PIN_SWD_VCCIO_EN_PORT][PIN_SWD_VCCIO_EN] = 1;
 
 }
 
@@ -252,6 +261,7 @@ __STATIC_INLINE void PORT_OFF(void)
 
     // Disable output buffers via VCCIO
     GPIO->B[PIN_SWD_VCCIO_EN_PORT][PIN_SWD_VCCIO_EN] = 0;
+
 }
 
 
@@ -500,11 +510,12 @@ __STATIC_INLINE void DAP_SETUP(void)
     static const iocon_group_t kPinConfigs[] = {
         {   .port = PIN_PIO_PORT,   .pin = PIN_TCK_SWCLK,       .modefunc = IOCON_FUNC0
                                                                             | IOCON_DIGITAL_EN
+                                                                            | IOCON_MODE_PULLDOWN
                                                                             | IOCON_SLEW_FAST
                                                                             },
         {   .port = PIN_PIO_PORT,   .pin = PIN_TMS_SWDIO,       .modefunc = IOCON_FUNC0
                                                                             | IOCON_DIGITAL_EN
-                                                                            | IOCON_MODE_PULLUP
+                                                                            | IOCON_MODE_PULLDOWN
                                                                             | IOCON_SLEW_FAST
                                                                             },
         {   .port = PIN_PIO_PORT,   .pin = PIN_TMS_SWDIO_TXEN,  .modefunc = IOCON_FUNC0
@@ -513,10 +524,12 @@ __STATIC_INLINE void DAP_SETUP(void)
                                                                             },
         {   .port = PIN_PIO_PORT,   .pin = PIN_TDI,             .modefunc = IOCON_FUNC0
                                                                             | IOCON_DIGITAL_EN
+                                                                            | IOCON_MODE_PULLDOWN
                                                                             | IOCON_SLEW_FAST
                                                                             },
         {   .port = PIN_PIO_PORT,   .pin = PIN_TDO_SWO,         .modefunc = IOCON_FUNC0
                                                                             | IOCON_DIGITAL_EN
+                                                                            | IOCON_MODE_PULLUP
                                                                             },
         {   .port = PIN_PIO_PORT,   .pin = PIN_RESET,           .modefunc = IOCON_FUNC0
                                                                             | IOCON_DIGITAL_EN
@@ -546,6 +559,16 @@ __STATIC_INLINE void DAP_SETUP(void)
             .pin = PIN_RESET_IN,
             .modefunc = IOCON_FUNC0 | IOCON_DIGITAL_EN | IOCON_MODE_PULLUP
         },
+        {
+            .port = PIN_VREF_TARGET_SWD_PORT,
+            .pin = PIN_VREF_TARGET_SWD,
+            .modefunc = IOCON_FUNC0 | IOCON_MODE_INACT// TODO IOCON_ANALOG_EN
+        },
+        {
+            .port = PIN_VREF_TARGET_SWD_PORT,
+            .pin = PIN_VREF_TARGET_SWD,
+            .modefunc = IOCON_FUNC0 | IOCON_MODE_INACT // TODO IOCON_ANALOG_EN |
+        },
     };
 
     IOCON_SetPinMuxing(IOCON, kPinConfigs, ARRAY_SIZE(kPinConfigs));
@@ -554,9 +577,11 @@ __STATIC_INLINE void DAP_SETUP(void)
     GPIO->CLR[PIN_PIO_PORT] = PIN_TMS_SWDIO_TXEN_MASK   // Disable TMS/SWDIO drive.
                                 | PIN_RESET_MASK;  // Dont assert reset
 
-    // disable VCCIO
+    // disable output buffers
     GPIO->CLR[PIN_SWD_VCCIO_EN_PORT] = PIN_SWD_VCCIO_EN_MASK;
-    GPIO->CLR[PIN_UART_VCCIO_EN_PORT] = PIN_UART_VCCIO_EN_MASK;
+    //GPIO->CLR[PIN_UART_VCCIO_EN_PORT] = PIN_UART_VCCIO_EN_MASK;
+    //TODO control?
+    GPIO->SET[PIN_UART_VCCIO_EN_PORT] = PIN_UART_VCCIO_EN_MASK;
 
     // turn off LEDs
     GPIO->SET[PIN_SWD_STATUS_LED_PORT] = PIN_SWD_STATUS_LED_MASK;
@@ -564,6 +589,8 @@ __STATIC_INLINE void DAP_SETUP(void)
 
     // Set GPIO directions.
     // TODO cleanup port assumption
+
+    // set outputs
     GPIO->DIRSET[PIN_PIO_PORT] = PIN_TMS_SWDIO_TXEN_MASK
                                     | PIN_RESET_MASK
                                     | PIN_SWD_VCCIO_EN_MASK
@@ -571,11 +598,14 @@ __STATIC_INLINE void DAP_SETUP(void)
                                     | PIN_SWD_STATUS_LED_MASK
                                     | PIN_UART_STATUS_LED_MASK;
 
+    // set inputs
     GPIO->DIRCLR[PIN_PIO_PORT] = PIN_TCK_SWCLK_MASK
                                     | PIN_TMS_SWDIO_MASK
                                     | PIN_TDO_SWO_MASK
                                     | PIN_TDI_MASK
                                     | PIN_RESET_MASK;
+    GPIO->DIRCLR[PIN_VREF_TARGET_SWD_PORT] = PIN_VREF_TARGET_SWD_MASK;
+    GPIO->DIRCLR[PIN_VREF_TARGET_UART_PORT] = PIN_VREF_TARGET_UART_MASK;
 }
 
 /** Reset Target Device with custom specific I/O pin or command sequence.

@@ -103,6 +103,14 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 #define PIN_SWD_STATUS_LED         (22U)
 #define PIN_SWD_STATUS_LED_MASK    (1U << PIN_SWD_STATUS_LED)
 
+// analog inputs
+#define PIN_VREF_TARGET_SWD_PORT    (0U)
+#define PIN_VREF_TARGET_SWD         (15U)
+#define PIN_VREF_TARGET_SWD_MASK    (1U << PIN_VREF_TARGET_SWD)
+#define PIN_VREF_TARGET_UART_PORT   (0U)
+#define PIN_VREF_TARGET_UART        (16U)
+#define PIN_VREF_TARGET_UART_MASK   (1U << PIN_VREF_TARGET_UART)
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Additional configuration for MCU-LINK-PRO support
 //////////////////////////////////////////////////////////////////////////////////////////////////
