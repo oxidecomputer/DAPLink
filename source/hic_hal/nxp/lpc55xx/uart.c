@@ -191,10 +191,12 @@ int32_t uart_get_configuration(UART_Configuration *config)
     return 1;
 }
 
+// TODO implement
 void uart_set_control_line_state(uint16_t ctrl_bmp)
 {
 }
 
+// get the available space in the write buffer
 int32_t uart_write_free(void)
 {
     return circ_buf_count_free(&write_buffer);
@@ -225,6 +227,7 @@ int32_t uart_write_data(uint8_t *data, uint16_t size)
         return 0;
     }
 
+    // TODO is the logic here correct?
     uint32_t cnt = circ_buf_write(&write_buffer, data, size);
     if (cb_buf.tx_size == 0) {
         // There's no pending transfer and the value of cb_buf.tx_size will not
@@ -241,6 +244,7 @@ int32_t uart_write_data(uint8_t *data, uint16_t size)
 
 int32_t uart_read_data(uint8_t *data, uint16_t size)
 {
+    USART_INSTANCE.Receive(&(cb_buf.rx), 1); // may be busy, thats ok
     return circ_buf_read(&read_buffer, data, size);
 }
 
@@ -249,12 +253,8 @@ void uart_handler(uint32_t event) {
         uint32_t free = circ_buf_count_free(&read_buffer);
         if (free > RX_OVRF_MSG_SIZE) {
             circ_buf_push(&read_buffer, cb_buf.rx);
-        } else if ((RX_OVRF_MSG_SIZE == free) && config_get_overflow_detect()) {
-            circ_buf_write(&read_buffer, (uint8_t*)RX_OVRF_MSG, RX_OVRF_MSG_SIZE);
-        } else {
-            // Drop character
+            USART_INSTANCE.Receive(&(cb_buf.rx), 1);
         }
-        USART_INSTANCE.Receive(&(cb_buf.rx), 1);
     }
 
     if (event & ARM_USART_EVENT_SEND_COMPLETE) {

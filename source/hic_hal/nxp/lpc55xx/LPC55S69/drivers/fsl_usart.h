@@ -150,6 +150,8 @@ typedef struct _usart_config
     bool loopback;                        /*!< Enable peripheral loopback */
     bool enableRx;                        /*!< Enable RX */
     bool enableTx;                        /*!< Enable TX */
+    bool enableRts;                       /*!< Enable RTS flow control */
+    bool enableCts;                       /*!< Enable CTS flow control */
     bool enableContinuousSCLK;            /*!< USART continuous Clock generation enable in synchronous master mode. */
     bool enableMode32k;                   /*!< USART uses 32 kHz clock from the RTC oscillator as the clock source. */
     usart_txfifo_watermark_t txWatermark; /*!< txFIFO watermark */

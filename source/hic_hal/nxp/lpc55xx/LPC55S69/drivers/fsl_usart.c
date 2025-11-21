@@ -208,6 +208,7 @@ status_t USART_Init(USART_Type *base, const usart_config_t *config, uint32_t src
         return result;
     }
 
+
     if (config->enableTx)
     {
         /* empty and enable txFIFO */
@@ -235,6 +236,9 @@ status_t USART_Init(USART_Type *base, const usart_config_t *config, uint32_t src
                 USART_CFG_SYNCEN((uint32_t)config->syncMode >> 1) | USART_CFG_SYNCMST((uint8_t)config->syncMode) |
                 USART_CFG_CLKPOL(config->clockPolarity) | USART_CFG_MODE32K(config->enableMode32k) |
                 USART_CFG_ENABLE_MASK;
+
+    // TODO Verify RTS generation is on by default. Control with pinmux.
+    USART_EnableCTS(base, config->enableCts);
 
     /* Setup baudrate */
     if (config->enableMode32k)
@@ -314,6 +318,8 @@ void USART_GetDefaultConfig(usart_config_t *config)
     config->loopback             = false;
     config->enableRx             = false;
     config->enableTx             = false;
+    config->enableRts            = false;
+    config->enableCts            = false;
     config->enableMode32k        = false;
     config->txWatermark          = kUSART_TxFifo0;
     config->rxWatermark          = kUSART_RxFifo1;

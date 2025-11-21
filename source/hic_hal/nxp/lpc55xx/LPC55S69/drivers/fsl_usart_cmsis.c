@@ -93,8 +93,8 @@ static const ARM_USART_CAPABILITIES s_usartDriverCapabilities = {
     0, /* supports usart IrDA mode */
     0, /* supports usart Smart Card mode */
     0, /* Smart Card Clock generator */
-    0, /* RTS Flow Control available */
-    0, /* CTS Flow Control available */
+    1, /* RTS Flow Control available */
+    1, /* CTS Flow Control available */
     0, /* Transmit completed event: \ref ARM_USART_EVENT_TX_COMPLETE */
     0, /* Signal receive character timeout event: \ref ARM_USART_EVENT_RX_TIMEOUT */
     0, /* RTS Line: 0=not available, 1=available */
@@ -181,6 +181,28 @@ static int32_t USART_CommonControl(uint32_t control,
             break;
         default:
             return ARM_USART_ERROR_STOP_BITS;
+    }
+
+    switch (control & ARM_USART_FLOW_CONTROL_Msk)
+    {
+        // exhaustive matching here is unnecessary but keeps things clear
+        case 0:
+            config.enableRts = false;
+            config.enableCts = false;
+        case ARM_USART_FLOW_CONTROL_CTS:
+            config.enableRts = false;
+            config.enableCts = true;
+            break;
+        case ARM_USART_FLOW_CONTROL_RTS:
+            config.enableRts = true;
+            config.enableCts = false;
+            break;
+        case ARM_USART_FLOW_CONTROL_RTS_CTS:
+            config.enableCts = true;
+            config.enableRts = true;
+            break;
+        default: // unused unless the mask changes
+            return ARM_USART_ERROR_FLOW_CONTROL;
     }
 
     /* If usart is already configured, deinit it first. */
@@ -674,7 +696,7 @@ static int32_t USART_NonBlockingControl(uint32_t control, uint32_t arg, cmsis_us
     }
 
     /* Does not support these features. */
-    if (control & (ARM_USART_FLOW_CONTROL_Msk | ARM_USART_CPOL_Msk | ARM_USART_CPHA_Msk))
+    if (control & (ARM_USART_CPOL_Msk | ARM_USART_CPHA_Msk))
     {
         return ARM_DRIVER_ERROR_UNSUPPORTED;
     }

@@ -89,7 +89,7 @@ int32_t USBD_CDC_ACM_PortSetLineCoding(CDC_LINE_CODING *line_coding)
     UART_Config.DataBits    = (UART_DataBits) line_coding->bDataBits;
     UART_Config.Parity      = (UART_Parity)   line_coding->bParityType;
     UART_Config.StopBits    = (UART_StopBits) line_coding->bCharFormat;
-    UART_Config.FlowControl = UART_FLOW_CONTROL_NONE;
+    UART_Config.FlowControl = UART_FLOW_CONTROL_RTS_CTS;
     return uart_set_configuration(&UART_Config);
 }
 
