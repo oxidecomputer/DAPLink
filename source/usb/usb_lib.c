@@ -2250,7 +2250,7 @@ const U8 USBD_BinaryObjectStoreDescriptor[] = { 0 };
   CDC_CS_INTERFACE,                     /* bDescriptorType: CS_INTERFACE */                                 \
   CDC_CALL_MANAGEMENT,                  /* bDescriptorSubtype: Call Management Func Desc */                 \
   0x03,                                 /* bmCapabilities: device handles call management */                \
-  0x02,                                 /* bDataInterface: CDC data IF ID */                                \
+  0x01,                                 /* bDataInterface: CDC data IF ID */                                \
 /* Abstract Control Management Functional Descriptor */                                                     \
   CDC_ABSTRACT_CONTROL_MANAGEMENT_SIZE, /* bFunctionLength */                                               \
   CDC_CS_INTERFACE,                     /* bDescriptorType: CS_INTERFACE */                                 \
