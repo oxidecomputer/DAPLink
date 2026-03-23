@@ -75,28 +75,38 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 #define PIN_UART_RX             (29U)
 #define PIN_UART_RX_MASK        (1U << PIN_UART_RX)
 
-// UART Tx Pin                  PIO0_20 (O)
+// UART Tx Pin                  PIO0_30 (O)
 // (FC0_TARGET_TXD)
 // function 1 (FC0_TXD_SCL_MISO_WS)
-#define PIN_UART_TX             (20U)
+#define PIN_UART_TX             (30U)
 #define PIN_UART_TX_MASK        (1U << PIN_UART_TX)
 
-#define PIN_RESET_IN_PORT          (0U)
-#define PIN_RESET_IN               (20U)
-#define PIN_RESET_IN_MASK          (1U << PIN_RESET_IN)
+#define PIN_RESET_IN_PORT       (0U)
+#define PIN_RESET_IN            (20U)
+#define PIN_RESET_IN_MASK       (1U << PIN_RESET_IN)
 
-#define PIN_SWD_VCCIO_EN_PORT      (0U)
-#define PIN_SWD_VCCIO_EN           (24U)
-#define PIN_SWD_VCCIO_EN_MASK      (1U << PIN_SWD_VCCIO_EN)
+// power control
+#define PIN_SWD_VCCIO_EN_PORT   (0U)
+#define PIN_SWD_VCCIO_EN        (24U)
+#define PIN_SWD_VCCIO_EN_MASK   (1U << PIN_SWD_VCCIO_EN)
 
-#define PIN_UART_VCCIO_EN_PORT     (0U)
-#define PIN_UART_VCCIO_EN          (7U)
-#define PIN_UART_VCCIO_EN_MASK     (1U << PIN_UART_VCCIO_EN)
+#define PIN_UART_VCCIO_EN_PORT  (0U)
+#define PIN_UART_VCCIO_EN       (17U)
+#define PIN_UART_VCCIO_EN_MASK  (1U << PIN_UART_VCCIO_EN)
+
+// buffer control
+#define PIN_SWD_EN_PORT         (0U)
+#define PIN_SWD_EN              (13U)
+#define PIN_SWD_EN_MASK         (1U << PIN_SWD_EN)
+
+#define PIN_UART_EN_PORT        (0U)
+#define PIN_UART_EN             (7U)
+#define PIN_UART_EN_MASK        (1U << PIN_UART_EN)
 
 // active low UART status LED
-#define PIN_UART_STATUS_LED_PORT    (0U)
-#define PIN_UART_STATUS_LED         (21U)
-#define PIN_UART_STATUS_LED_MASK    (1U << PIN_UART_STATUS_LED)
+#define PIN_UART_STATUS_LED_PORT   (0U)
+#define PIN_UART_STATUS_LED        (21U)
+#define PIN_UART_STATUS_LED_MASK   (1U << PIN_UART_STATUS_LED)
 
 // active low SWD status LED
 #define PIN_SWD_STATUS_LED_PORT    (0U)
@@ -104,12 +114,12 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 #define PIN_SWD_STATUS_LED_MASK    (1U << PIN_SWD_STATUS_LED)
 
 // analog inputs
-#define PIN_VREF_TARGET_SWD_PORT    (0U)
-#define PIN_VREF_TARGET_SWD         (15U)
-#define PIN_VREF_TARGET_SWD_MASK    (1U << PIN_VREF_TARGET_SWD)
-#define PIN_VREF_TARGET_UART_PORT   (0U)
-#define PIN_VREF_TARGET_UART        (16U)
-#define PIN_VREF_TARGET_UART_MASK   (1U << PIN_VREF_TARGET_UART)
+#define PIN_VREF_TARGET_SWD_PORT   (0U)
+#define PIN_VREF_TARGET_SWD        (15U)
+#define PIN_VREF_TARGET_SWD_MASK   (1U << PIN_VREF_TARGET_SWD)
+#define PIN_VREF_TARGET_UART_PORT  (0U)
+#define PIN_VREF_TARGET_UART       (16U)
+#define PIN_VREF_TARGET_UART_MASK  (1U << PIN_VREF_TARGET_UART)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Additional configuration for MCU-LINK-PRO support

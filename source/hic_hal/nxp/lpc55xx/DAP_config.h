@@ -198,7 +198,9 @@ Configures the DAP Hardware I/O pins for JTAG mode:
 */
 __STATIC_INLINE void PORT_JTAG_SETUP(void)
 {
-    // Enable output buffers via VCCIO
+    // Enable output buffers
+    GPIO->B[PIN_SWD_EN_PORT][PIN_SWD_EN] = 1;
+    // Enable output buffers VCCIO
     GPIO->B[PIN_SWD_VCCIO_EN_PORT][PIN_SWD_VCCIO_EN] = 1;
 
     // Set TCK, TMS, TDI GPIO outputs to high.
@@ -222,7 +224,9 @@ Configures the DAP Hardware I/O pins for Serial Wire Debug (SWD) mode:
 */
 __STATIC_INLINE void PORT_SWD_SETUP(void)
 {
-    // Enable output buffers via VCCIO
+    // Enable output buffers
+    GPIO->B[PIN_SWD_EN_PORT][PIN_SWD_EN] = 1;
+    // Enable output buffers VCCIO
     GPIO->B[PIN_SWD_VCCIO_EN_PORT][PIN_SWD_VCCIO_EN] = 1;
 
     // Set SWCLK and SWDIO GPIO outputs to high before enabling the translator.
@@ -232,8 +236,7 @@ __STATIC_INLINE void PORT_SWD_SETUP(void)
     GPIO->DIRSET[PIN_PIO_PORT] = PIN_TCK_SWCLK_MASK | PIN_TMS_SWDIO_MASK;
 
     // Set TDI to input.
-    // this needs to be output to ensure its driven to a known value
-    //GPIO->DIRCLR[PIN_PIO_PORT] = PIN_TDI_MASK;
+    GPIO->DIRCLR[PIN_PIO_PORT] = PIN_TDI_MASK;
 
     // Enable SWDIO translator output.
     GPIO->B[PIN_PIO_PORT][PIN_TMS_SWDIO_TXEN] = 1;
@@ -259,7 +262,9 @@ __STATIC_INLINE void PORT_OFF(void)
     // Switch TDO_SWO to Flexcomm (SWO).
     IOCON->PIO[PIN_PIO_PORT][PIN_TDO_SWO] = IOCON_FUNC1 | IOCON_DIGITAL_EN;
 
-    // Disable output buffers via VCCIO
+    // Disable output buffers
+    GPIO->B[PIN_SWD_EN_PORT][PIN_SWD_EN] = 0;
+    // Disable output buffers VCCIO
     GPIO->B[PIN_SWD_VCCIO_EN_PORT][PIN_SWD_VCCIO_EN] = 0;
 
 }
@@ -331,6 +336,7 @@ __STATIC_FORCEINLINE uint32_t PIN_SWDIO_IN(void)
 */
 __STATIC_FORCEINLINE void     PIN_SWDIO_OUT(uint32_t bit)
 {
+
     GPIO->B[PIN_PIO_PORT][PIN_TMS_SWDIO] = bit;
 }
 
@@ -545,6 +551,16 @@ __STATIC_INLINE void DAP_SETUP(void)
             .modefunc = IOCON_FUNC0 | IOCON_DIGITAL_EN
         },
         {
+            .port = PIN_SWD_EN_PORT,
+            .pin = PIN_SWD_EN,
+            .modefunc = IOCON_FUNC0 | IOCON_DIGITAL_EN | IOCON_GPIO_MODE
+        },
+        {
+            .port = PIN_UART_EN_PORT,
+            .pin = PIN_UART_EN,
+            .modefunc = IOCON_FUNC0 | IOCON_DIGITAL_EN
+        },
+        {
             .port = PIN_SWD_STATUS_LED_PORT,
             .pin = PIN_SWD_STATUS_LED,
             .modefunc = IOCON_FUNC0 | IOCON_DIGITAL_EN
@@ -560,8 +576,8 @@ __STATIC_INLINE void DAP_SETUP(void)
             .modefunc = IOCON_FUNC0 | IOCON_DIGITAL_EN | IOCON_MODE_PULLUP
         },
         {
-            .port = PIN_VREF_TARGET_SWD_PORT,
-            .pin = PIN_VREF_TARGET_SWD,
+            .port = PIN_VREF_TARGET_UART_PORT,
+            .pin = PIN_VREF_TARGET_UART,
             .modefunc = IOCON_FUNC0 | IOCON_MODE_INACT// TODO IOCON_ANALOG_EN
         },
         {
@@ -578,9 +594,10 @@ __STATIC_INLINE void DAP_SETUP(void)
                                 | PIN_RESET_MASK;  // Dont assert reset
 
     // disable output buffers
+    GPIO->CLR[PIN_SWD_EN_PORT] = PIN_SWD_EN_MASK;
     GPIO->CLR[PIN_SWD_VCCIO_EN_PORT] = PIN_SWD_VCCIO_EN_MASK;
-    //GPIO->CLR[PIN_UART_VCCIO_EN_PORT] = PIN_UART_VCCIO_EN_MASK;
-    //TODO control?
+    //TODO control determine how to control UART
+    GPIO->SET[PIN_UART_EN_PORT] = PIN_UART_EN_MASK;
     GPIO->SET[PIN_UART_VCCIO_EN_PORT] = PIN_UART_VCCIO_EN_MASK;
 
     // turn off LEDs
@@ -595,6 +612,8 @@ __STATIC_INLINE void DAP_SETUP(void)
                                     | PIN_RESET_MASK
                                     | PIN_SWD_VCCIO_EN_MASK
                                     | PIN_UART_VCCIO_EN_MASK
+                                    | PIN_SWD_EN_MASK
+                                    | PIN_UART_EN_MASK
                                     | PIN_SWD_STATUS_LED_MASK
                                     | PIN_UART_STATUS_LED_MASK;
 
