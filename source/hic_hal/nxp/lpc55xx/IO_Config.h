@@ -113,6 +113,11 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 #define PIN_SWD_STATUS_LED         (22U)
 #define PIN_SWD_STATUS_LED_MASK    (1U << PIN_SWD_STATUS_LED)
 
+// active low UC status LED
+#define PIN_UC_STATUS_LED_PORT     (0U)
+#define PIN_UC_STATUS_LED          (9U)
+#define PIN_UC_STATUS_LED_MASK     (1U << PIN_UC_STATUS_LED)
+
 // analog inputs
 #define PIN_VREF_TARGET_SWD_PORT   (0U)
 #define PIN_VREF_TARGET_SWD        (15U)

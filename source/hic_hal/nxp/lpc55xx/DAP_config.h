@@ -571,6 +571,11 @@ __STATIC_INLINE void DAP_SETUP(void)
             .modefunc = IOCON_FUNC0 | IOCON_DIGITAL_EN
         },
         {
+            .port = PIN_UC_STATUS_LED_PORT,
+            .pin = PIN_UC_STATUS_LED,
+            .modefunc = IOCON_FUNC0 | IOCON_DIGITAL_EN
+        },
+        {
             .port = PIN_RESET_IN_PORT,
             .pin = PIN_RESET_IN,
             .modefunc = IOCON_FUNC0 | IOCON_DIGITAL_EN | IOCON_MODE_PULLUP
@@ -590,8 +595,9 @@ __STATIC_INLINE void DAP_SETUP(void)
     IOCON_SetPinMuxing(IOCON, kPinConfigs, ARRAY_SIZE(kPinConfigs));
 
     // Configure GPIO outputs.
-    GPIO->CLR[PIN_PIO_PORT] = PIN_TMS_SWDIO_TXEN_MASK   // Disable TMS/SWDIO drive.
-                                | PIN_RESET_MASK;  // Dont assert reset
+    GPIO->CLR[PIN_PIO_PORT] = PIN_TMS_SWDIO_TXEN_MASK    // Disable TMS/SWDIO drive.
+                                | PIN_UC_STATUS_LED_MASK // Drive the uC LED
+                                | PIN_RESET_MASK;        // Dont assert reset
 
     // disable output buffers
     GPIO->CLR[PIN_SWD_EN_PORT] = PIN_SWD_EN_MASK;
@@ -614,6 +620,7 @@ __STATIC_INLINE void DAP_SETUP(void)
                                     | PIN_UART_VCCIO_EN_MASK
                                     | PIN_SWD_EN_MASK
                                     | PIN_UART_EN_MASK
+                                    | PIN_UC_STATUS_LED_MASK
                                     | PIN_SWD_STATUS_LED_MASK
                                     | PIN_UART_STATUS_LED_MASK;
 
