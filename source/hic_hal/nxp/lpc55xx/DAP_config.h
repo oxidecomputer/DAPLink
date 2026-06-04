@@ -629,7 +629,8 @@ __STATIC_INLINE void DAP_SETUP(void)
                                     | PIN_TMS_SWDIO_MASK
                                     | PIN_TDO_SWO_MASK
                                     | PIN_TDI_MASK
-                                    | PIN_RESET_MASK;
+                                    | PIN_RESET_IN_MASK;
+
     GPIO->DIRCLR[PIN_VREF_TARGET_SWD_PORT] = PIN_VREF_TARGET_SWD_MASK;
     GPIO->DIRCLR[PIN_VREF_TARGET_UART_PORT] = PIN_VREF_TARGET_UART_MASK;
 }
