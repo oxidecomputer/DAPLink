@@ -43,7 +43,7 @@ void USART0_InitPins(void)
                                          /* Open drain is disabled */
                                          IOCON_PIO_OPENDRAIN_DI);
     /* PORT0 PIN29 (coords: ?) is configured as FC0_RXD_SDA_MOSI_DATA */
-    IOCON_PinMuxSet(IOCON, 0U, 29U, port0_pin29_config);
+    // IOCON_PinMuxSet(IOCON, 0U, 29U, port0_pin29_config);
 
     const uint32_t port0_pin30_config = (/* Pin is configured as FC0_TXD_SCL_MISO_WS */
                                          IOCON_PIO_FUNC1 |
@@ -58,7 +58,7 @@ void USART0_InitPins(void)
                                          /* Open drain is disabled */
                                          IOCON_PIO_OPENDRAIN_DI);
     /* PORT0 PIN30 (coords: ?) is configured as FC0_TXD_SCL_MISO_WS */
-    IOCON_PinMuxSet(IOCON, 0U, 30U, port0_pin30_config);
+    // IOCON_PinMuxSet(IOCON, 0U, 30U, port0_pin30_config);
 
     const uint32_t port0_pin31_config = (/* Pin is configured as FC0_CTS_SDAX_SSEL0 */
                                          IOCON_PIO_FUNC1 |
@@ -72,7 +72,7 @@ void USART0_InitPins(void)
                                          IOCON_PIO_DIGITAL_EN |
                                          /* Open drain is disabled */
                                          IOCON_PIO_OPENDRAIN_DI);
-    IOCON_PinMuxSet(IOCON, 0U, 31U, port0_pin31_config);
+    // IOCON_PinMuxSet(IOCON, 0U, 31U, port0_pin31_config);
 
     const uint32_t port1_pin0_config = (/* Pin is configured as FC0_RTS_SDLX_SSEL1 */
                                          IOCON_PIO_FUNC1 |
@@ -86,7 +86,7 @@ void USART0_InitPins(void)
                                          IOCON_PIO_DIGITAL_EN |
                                          /* Open drain is disabled */
                                          IOCON_PIO_OPENDRAIN_DI);
-    IOCON_PinMuxSet(IOCON, 1U, 0U, port1_pin0_config);
+    // IOCON_PinMuxSet(IOCON, 1U, 0U, port1_pin0_config);
 }
 
 void USART0_DeinitPins(void)
@@ -107,7 +107,7 @@ void USART0_DeinitPins(void)
                                          /* Open drain is disabled */
                                          IOCON_PIO_OPENDRAIN_DI);
     /* PORT0 PIN29 (coords: ?) is configured as PIO0_29 */
-    IOCON_PinMuxSet(IOCON, 0U, 29U, port0_pin29_config);
+    //IOCON_PinMuxSet(IOCON, 0U, 29U, port0_pin29_config);
 
     const uint32_t port0_pin30_config = (/* Pin is configured as PIO */
                                          IOCON_PIO_FUNC0 |
@@ -122,7 +122,7 @@ void USART0_DeinitPins(void)
                                          /* Open drain is disabled */
                                          IOCON_PIO_OPENDRAIN_DI);
     /* PORT0 PIN25 (coords: ?) is configured as PIO0_30 */
-    IOCON_PinMuxSet(IOCON, 0U, 30U, port0_pin30_config);
+    //IOCON_PinMuxSet(IOCON, 0U, 30U, port0_pin30_config);
 
     const uint32_t port0_pin31_config = (/* Pin is configured as PIO */
                                          IOCON_PIO_FUNC0 |
@@ -137,7 +137,7 @@ void USART0_DeinitPins(void)
                                          /* Open drain is disabled */
                                          IOCON_PIO_OPENDRAIN_DI);
     /* PORT0 PIN25 (coords: ?) is configured as PIO0_30 */
-    IOCON_PinMuxSet(IOCON, 0U, 31U, port0_pin31_config);
+    //IOCON_PinMuxSet(IOCON, 0U, 31U, port0_pin31_config);
 
     const uint32_t port1_pin0_config = (/* Pin is configured as PIO */
                                          IOCON_PIO_FUNC0 |
@@ -152,7 +152,7 @@ void USART0_DeinitPins(void)
                                          /* Open drain is disabled */
                                          IOCON_PIO_OPENDRAIN_DI);
     /* PORT0 PIN25 (coords: ?) is configured as PIO0_30 */
-    IOCON_PinMuxSet(IOCON, 1U, 0U, port1_pin0_config);
+    //IOCON_PinMuxSet(IOCON, 1U, 0U, port1_pin0_config);
 }
 
 uint32_t USART3_GetFreq(void)

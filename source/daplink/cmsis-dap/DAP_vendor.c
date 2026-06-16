@@ -53,6 +53,13 @@ static const uint32_t file_stream_buffer_size = sizeof(usb_buffer);
 static uint16_t file_stream_buffer_pos = 0;
 #endif
 
+extern void PIN_SPI_CS_L_SET(bool v);
+extern void PIN_SPI_CRESET_SET(bool v);
+extern uint32_t PIN_SPI_CDONE_IN(void);
+
+#define SPI_RESET 0
+#define SPI_CS_L 1
+
 //**************************************************************************************************
 /**
 \defgroup DAP_Vendor_Adapt_gr Adapt Vendor Commands
@@ -226,7 +233,20 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
     }
     case ID_DAP_Vendor14: break;
     case ID_DAP_Vendor15: break;
-    case ID_DAP_Vendor16: break;
+    case ID_DAP_Vendor16: {
+        // expects a byte. top 4 bits are mask, bottom are value to set pin to
+        // if mask is set. returns state of CDONE in a single byte
+        const uint8_t mask = (*request >> 4) & 0b11;
+        const uint8_t cmd = *request & 0b11;
+        if (mask & SPI_CS_L) {
+            PIN_SPI_CS_L_SET(cmd & SPI_CS_L);
+        }
+        if (mask & SPI_RESET) {
+            PIN_SPI_CRESET_SET(cmd & SPI_RESET);
+        }
+        *response = PIN_SPI_CDONE_IN();
+        break;
+    }
     case ID_DAP_Vendor17: break;
     case ID_DAP_Vendor18: break;
     case ID_DAP_Vendor19: break;

@@ -126,6 +126,32 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 #define PIN_VREF_TARGET_UART       (16U)
 #define PIN_VREF_TARGET_UART_MASK  (1U << PIN_VREF_TARGET_UART)
 
+// testing SPI
+#define PIN_SPI_SCK_PORT  (0U)
+#define PIN_SPI_SCK       (18U)
+#define PIN_SPI_SCK_MASK  (1U << PIN_SPI_SCK)
+
+#define PIN_SPI_MOSI_PORT (0U)
+#define PIN_SPI_MOSI      (24U)
+#define PIN_SPI_MOSI_MASK (1U << PIN_SPI_MOSI)
+
+#define PIN_SPI_MISO_PORT (0U)
+#define PIN_SPI_MISO      (24U)
+#define PIN_SPI_MISO_MASK (1U << PIN_SPI_MISO)
+
+#define PIN_SPI_CS_L_PORT (0U)
+#define PIN_SPI_CS_L      PIN_TCK_SWCLK
+#define PIN_SPI_CS_L_MASK (1U << PIN_SPI_CS_L)
+
+#define PIN_SPI_CDONE_PORT (0U)
+#define PIN_SPI_CDONE      PIN_TMS_SWDIO
+#define PIN_SPI_CDONE_MASK (1U << PIN_SPI_CDONE)
+
+#define PIN_SPI_CRESET_PORT (0U)
+#define PIN_SPI_CRESET      PIN_TDI
+#define PIN_SPI_CRESET_MASK (1U << PIN_SPI_CRESET)
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Additional configuration for MCU-LINK-PRO support
 //////////////////////////////////////////////////////////////////////////////////////////////////
