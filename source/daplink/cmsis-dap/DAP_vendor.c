@@ -59,6 +59,7 @@ extern uint32_t PIN_SPI_CDONE_IN(void);
 
 #define SPI_RESET (1 << 0)
 #define SPI_CS_L (1 << 1)
+#define SPI_CDONE (1 << 4)
 
 //**************************************************************************************************
 /**
@@ -244,7 +245,8 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         if (mask & SPI_RESET) {
             PIN_SPI_CRESET_SET(cmd & SPI_RESET);
         }
-        *response = PIN_SPI_CDONE_IN();
+        *response = PIN_SPI_CDONE_IN() ? SPI_CDONE : 0;
+        num += (1U << 16) | 1U; // increment request and response count each by 1
         break;
     }
     case ID_DAP_Vendor17: break;
