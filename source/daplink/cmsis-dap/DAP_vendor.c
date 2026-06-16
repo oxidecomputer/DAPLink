@@ -57,8 +57,8 @@ extern void PIN_SPI_CS_L_SET(bool v);
 extern void PIN_SPI_CRESET_SET(bool v);
 extern uint32_t PIN_SPI_CDONE_IN(void);
 
-#define SPI_RESET 0
-#define SPI_CS_L 1
+#define SPI_RESET (1 << 0)
+#define SPI_CS_L (1 << 1)
 
 //**************************************************************************************************
 /**
