@@ -41,6 +41,8 @@
 #include "util.h"
 #include <string.h>
 #include "daplink_vendor_commands.h"
+#include "fsl_spi.h"
+#include "fsl_device_registers.h"
 
 #ifdef DRAG_N_DROP_SUPPORT
 #include "file_stream.h"
@@ -237,8 +239,8 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
     case ID_DAP_Vendor16: {
         // expects a byte. top 4 bits are mask, bottom are value to set pin to
         // if mask is set. returns state of CDONE in a single byte
-        const uint8_t mask = (*request >> 4) & 0b11;
-        const uint8_t cmd = *request & 0b11;
+        const uint8_t mask = (*request >> 4) & 0xF;
+        const uint8_t cmd = *request & 0xF;
         if (mask & SPI_CS_L) {
             PIN_SPI_CS_L_SET(cmd & SPI_CS_L);
         }
@@ -249,7 +251,18 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         num += (1U << 16) | 1U; // increment request and response count each by 1
         break;
     }
-    case ID_DAP_Vendor17: break;
+    case ID_DAP_Vendor17: {
+        // expects a byte length and then that many bytes of data
+        const uint8_t len = *request++;
+        *response++ = len;
+        spi_transfer_t xfer = {0};
+        xfer.txData = (uint8_t*) request;
+        xfer.rxData = response;
+        xfer.dataSize = len;
+        SPI_MasterTransferBlocking(SPI7, &xfer);
+        num += (((uint16_t)len + 1U) << 16) | 1U + len; // increment request and response count each by 1
+        break;
+    }
     case ID_DAP_Vendor18: break;
     case ID_DAP_Vendor19: break;
     case ID_DAP_Vendor20: break;

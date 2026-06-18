@@ -128,15 +128,15 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 
 // testing SPI
 #define PIN_SPI_SCK_PORT  (0U)
-#define PIN_SPI_SCK       (18U)
+#define PIN_SPI_SCK       (21U)
 #define PIN_SPI_SCK_MASK  (1U << PIN_SPI_SCK)
 
 #define PIN_SPI_MOSI_PORT (0U)
-#define PIN_SPI_MOSI      (24U)
+#define PIN_SPI_MOSI      (20U)
 #define PIN_SPI_MOSI_MASK (1U << PIN_SPI_MOSI)
 
 #define PIN_SPI_MISO_PORT (0U)
-#define PIN_SPI_MISO      (24U)
+#define PIN_SPI_MISO      (19U)
 #define PIN_SPI_MISO_MASK (1U << PIN_SPI_MISO)
 
 #define PIN_SPI_CS_L_PORT (0U)

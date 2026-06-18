@@ -178,7 +178,7 @@ void USART3_InitPins(void)
                                          /* Open drain is disabled */
                                          IOCON_PIO_OPENDRAIN_DI);
     /* PORT0 PIN3 (coords: ?) is configured as FC3_RXD_SDA_MOSI_DATA */
-    IOCON_PinMuxSet(IOCON, 0U, 3U, port0_pin3_config);
+    //IOCON_PinMuxSet(IOCON, 0U, 3U, port0_pin3_config);
 }
 
 void USART3_DeinitPins(void)
@@ -199,7 +199,7 @@ void USART3_DeinitPins(void)
                                          /* Open drain is disabled */
                                          IOCON_PIO_OPENDRAIN_DI);
     /* PORT0 PIN29 (coords: ?) is configured as PIO0_24 */
-    IOCON_PinMuxSet(IOCON, 0U, 3U, port0_pin3_config);
+    //IOCON_PinMuxSet(IOCON, 0U, 3U, port0_pin3_config);
 }
 
 void init_vbus_pin(void)

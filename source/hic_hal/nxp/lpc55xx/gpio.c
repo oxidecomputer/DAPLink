@@ -47,7 +47,7 @@ void gpio_init(void) {
                              SYSCON_AHBCLKCTRL0_GPIO0_MASK |
                              SYSCON_AHBCLKCTRL0_GPIO1_MASK;
   SYSCON->AHBCLKCTRLSET[1] =
-      SYSCON_AHBCLKCTRL1_FC0_MASK | SYSCON_AHBCLKCTRL1_FC3_MASK;
+      SYSCON_AHBCLKCTRL1_FC0_MASK | SYSCON_AHBCLKCTRL1_FC3_MASK | SYSCON_AHBCLKCTRL1_FC7_MASK;
 
   // Reset peripherals.
   RESET_PeripheralReset(kIOCON_RST_SHIFT_RSTn);
@@ -55,6 +55,7 @@ void gpio_init(void) {
   RESET_PeripheralReset(kGPIO1_RST_SHIFT_RSTn);
   RESET_PeripheralReset(kFC0_RST_SHIFT_RSTn);
   RESET_PeripheralReset(kFC3_RST_SHIFT_RSTn);
+  RESET_PeripheralReset(kFC7_RST_SHIFT_RSTn);
 
   board_gpio_init();
 }

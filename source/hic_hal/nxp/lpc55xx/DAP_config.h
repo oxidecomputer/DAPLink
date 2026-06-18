@@ -24,6 +24,9 @@
 
 #include "IO_Config.h"
 #include "fsl_iocon.h"
+#include "fsl_spi.h"
+#include "fsl_device_registers.h"
+#include "fsl_flexcomm.h"
 #include "gpio.h"
 
 //**************************************************************************************************
@@ -537,6 +540,17 @@ __STATIC_INLINE void DAP_SETUP(void)
         {   .port = PIN_SPI_CDONE_PORT,   .pin = PIN_SPI_CDONE,         .modefunc = IOCON_FUNC0
                                                                             | IOCON_DIGITAL_EN
                                                                             },
+        {   .port = PIN_SPI_SCK_PORT,   .pin = PIN_SPI_SCK,         .modefunc = IOCON_FUNC7
+                                                                            | IOCON_SLEW_STANDARD
+                                                                            | IOCON_DIGITAL_EN
+                                                                            },
+        {   .port = PIN_SPI_MOSI_PORT,   .pin = PIN_SPI_MOSI,         .modefunc = IOCON_FUNC7
+                                                                            | IOCON_SLEW_STANDARD
+                                                                            | IOCON_DIGITAL_EN
+                                                                            },
+        {   .port = PIN_SPI_MISO_PORT,   .pin = PIN_SPI_MISO,         .modefunc = IOCON_FUNC7
+                                                                            | IOCON_DIGITAL_EN
+                                                                            },
     };
 
     IOCON_SetPinMuxing(IOCON, kPinConfigs, ARRAY_SIZE(kPinConfigs));
@@ -554,11 +568,19 @@ __STATIC_INLINE void DAP_SETUP(void)
 
     // set outputs
     GPIO->DIRSET[PIN_PIO_PORT] = PIN_SPI_CS_L_MASK
-                                    | PIN_SPI_CRESET_MASK;
+                                | PIN_SPI_CRESET_MASK
+                                | PIN_SPI_SCK_MASK
+                                | PIN_SPI_MOSI_MASK;
 
     // set inputs
-    GPIO->DIRCLR[PIN_PIO_PORT] = PIN_SPI_CDONE_MASK;
+    GPIO->DIRCLR[PIN_PIO_PORT] = PIN_SPI_CDONE_MASK
+                                | PIN_SPI_MISO_MASK;
 
+    spi_master_config_t userConfig;
+
+    CLOCK_AttachClk(kFRO12M_to_FLEXCOMM7);
+    SPI_MasterGetDefaultConfig(&userConfig);
+    SPI_MasterInit(SPI7, &userConfig, 12000000);
 }
 
 /** Reset Target Device with custom specific I/O pin or command sequence.
