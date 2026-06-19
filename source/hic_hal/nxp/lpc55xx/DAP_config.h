@@ -27,6 +27,7 @@
 #include "fsl_spi.h"
 #include "fsl_device_registers.h"
 #include "fsl_flexcomm.h"
+#include "pin_mux.h"
 #include "gpio.h"
 
 //**************************************************************************************************
@@ -279,7 +280,49 @@ __STATIC_FORCEINLINE void PIN_SPI_CS_L_SET(bool v)
 
 __STATIC_FORCEINLINE void PIN_SPI_CRESET_SET(bool v)
 {
-    GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET] = v ? 1 : 0;
+  const uint32_t DISABLE_PIN = (
+       /* Pin is configured as PIO */
+       IOCON_PIO_FUNC0 |
+       /* No addition pin function */
+       IOCON_PIO_MODE_INACT |
+       /* Standard mode, output slew rate control is enabled */
+       IOCON_PIO_SLEW_STANDARD |
+       /* Input function is not inverted */
+       IOCON_PIO_INV_DI |
+       /* Enables digital function */
+       IOCON_PIO_DIGITAL_EN |
+       /* Open drain is disabled */
+       IOCON_PIO_OPENDRAIN_DI
+  );
+
+  const uint32_t ENABLE_PIN = (
+       /* Pin is configured as FC7 */
+       IOCON_PIO_FUNC7 |
+       /* No addition pin function */
+       IOCON_PIO_MODE_INACT |
+       /* Standard mode, output slew rate control is enabled */
+       IOCON_PIO_SLEW_STANDARD |
+       /* Input function is not inverted */
+       IOCON_PIO_INV_DI |
+       /* Enables digital function */
+       IOCON_PIO_DIGITAL_EN |
+       /* Open drain is disabled */
+       IOCON_PIO_OPENDRAIN_DI
+  );
+
+  // SCK, MOSI, CS should only be outputs when creset is low
+  if (v) {
+        // deassert reset
+        IOCON_PinMuxSet(IOCON, PIN_SPI_SCK_PORT, PIN_SPI_SCK, DISABLE_PIN);
+        IOCON_PinMuxSet(IOCON, PIN_SPI_MOSI_PORT, PIN_SPI_MOSI, DISABLE_PIN);
+        GPIO->DIRCLR[PIN_SPI_CS_L_PORT] = PIN_SPI_CS_L_MASK;
+        GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET] = 1; // exit reset last
+  } else {
+        GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET] = 0; // reset first
+        IOCON_PinMuxSet(IOCON, PIN_SPI_SCK_PORT, PIN_SPI_SCK, ENABLE_PIN);
+        IOCON_PinMuxSet(IOCON, PIN_SPI_MOSI_PORT, PIN_SPI_MOSI, ENABLE_PIN);
+        GPIO->DIRSET[PIN_SPI_CS_L_PORT] = PIN_SPI_CS_L_MASK;
+  }
 }
 
 __STATIC_FORCEINLINE uint32_t PIN_SPI_CDONE_IN(void)
@@ -540,11 +583,11 @@ __STATIC_INLINE void DAP_SETUP(void)
         {   .port = PIN_SPI_CDONE_PORT,   .pin = PIN_SPI_CDONE,         .modefunc = IOCON_FUNC0
                                                                             | IOCON_DIGITAL_EN
                                                                             },
-        {   .port = PIN_SPI_SCK_PORT,   .pin = PIN_SPI_SCK,         .modefunc = IOCON_FUNC7
+        {   .port = PIN_SPI_SCK_PORT,   .pin = PIN_SPI_SCK,         .modefunc = IOCON_FUNC0
                                                                             | IOCON_SLEW_STANDARD
                                                                             | IOCON_DIGITAL_EN
                                                                             },
-        {   .port = PIN_SPI_MOSI_PORT,   .pin = PIN_SPI_MOSI,         .modefunc = IOCON_FUNC7
+        {   .port = PIN_SPI_MOSI_PORT,   .pin = PIN_SPI_MOSI,         .modefunc = IOCON_FUNC0
                                                                             | IOCON_SLEW_STANDARD
                                                                             | IOCON_DIGITAL_EN
                                                                             },
@@ -557,7 +600,8 @@ __STATIC_INLINE void DAP_SETUP(void)
 
     // Configure GPIO outputs.
     GPIO->SET[PIN_PIO_PORT] = PIN_SPI_CS_L_MASK
-                                | PIN_SPI_CRESET_MASK;
+                                | PIN_SPI_CRESET_MASK
+                                | PIN_SPI_SCK_MASK;
 
     // turn off LEDs
     //GPIO->SET[PIN_SWD_STATUS_LED_PORT] = PIN_SWD_STATUS_LED_MASK;
@@ -567,16 +611,17 @@ __STATIC_INLINE void DAP_SETUP(void)
     // TODO cleanup port assumption
 
     // set outputs
-    GPIO->DIRSET[PIN_PIO_PORT] = PIN_SPI_CS_L_MASK
-                                | PIN_SPI_CRESET_MASK
+    GPIO->DIRSET[PIN_PIO_PORT] = PIN_SPI_CRESET_MASK;
+
+    // set inputs - SCK, CS_L, and MOSI should be toggled on with CRESET low
+    GPIO->DIRCLR[PIN_PIO_PORT] = PIN_SPI_CDONE_MASK
+                                | PIN_SPI_MISO_MASK
+                                | PIN_SPI_CS_L_MASK
                                 | PIN_SPI_SCK_MASK
                                 | PIN_SPI_MOSI_MASK;
 
-    // set inputs
-    GPIO->DIRCLR[PIN_PIO_PORT] = PIN_SPI_CDONE_MASK
-                                | PIN_SPI_MISO_MASK;
-
     spi_master_config_t userConfig;
+    userConfig.baudRate_Bps = 1000000;
 
     CLOCK_AttachClk(kFRO12M_to_FLEXCOMM7);
     SPI_MasterGetDefaultConfig(&userConfig);
