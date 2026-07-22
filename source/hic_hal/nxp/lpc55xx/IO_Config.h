@@ -45,12 +45,12 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 
 // SWDIO Output Enable Pin      PIO0_28 (O)
 // (DBGIF_TMS_SWDIO_TXEN)
-#define PIN_TMS_SWDIO_TXEN      (28U)
+#define PIN_TMS_SWDIO_TXEN      (22U)
 #define PIN_TMS_SWDIO_TXEN_MASK (1U << PIN_TMS_SWDIO_TXEN)
 
 // TDI Output Pin               PIO0_1 (O)
 // (DBGIF_TDI)
-#define PIN_TDI                 (1U)
+#define PIN_TDI                 (4U) // UNUSED
 #define PIN_TDI_MASK            (1U << PIN_TDI)
 
 // TDO/SWO Input Pin            PIO0_3 (I)
@@ -61,8 +61,12 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 
 // nRESET Pin                   PIO0_19 (O)
 // (DBGIF_RESET)
-#define PIN_RESET               (19U)
+#define PIN_RESET               (13U)
 #define PIN_RESET_MASK          (1U << PIN_RESET)
+
+#define PIN_RESET_IN_PORT       (0U)
+#define PIN_RESET_IN            (14U)
+#define PIN_RESET_IN_MASK       (1U << PIN_RESET_IN)
 
 
 // Oxide customization
@@ -81,50 +85,52 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 #define PIN_UART_TX             (30U)
 #define PIN_UART_TX_MASK        (1U << PIN_UART_TX)
 
-#define PIN_RESET_IN_PORT       (0U)
-#define PIN_RESET_IN            (20U)
-#define PIN_RESET_IN_MASK       (1U << PIN_RESET_IN)
+#define PIN_UART_CTS_PORT       (0U)
+#define PIN_UART_CTS            (31U)
+#define PIN_UART_CTS_MASK       (1 << PIN_UART_CTS_MASK)
 
-// power control
-#define PIN_SWD_VCCIO_EN_PORT   (0U)
-#define PIN_SWD_VCCIO_EN        (24U)
-#define PIN_SWD_VCCIO_EN_MASK   (1U << PIN_SWD_VCCIO_EN)
-
-#define PIN_UART_VCCIO_EN_PORT  (0U)
-#define PIN_UART_VCCIO_EN       (17U)
-#define PIN_UART_VCCIO_EN_MASK  (1U << PIN_UART_VCCIO_EN)
+#define PIN_UART_RTS_PORT       (1U)
+#define PIN_UART_RTS            (0U)
+#define PIN_UART_RTS_MASK       (1 << PIN_UART_RTS_MASK)
 
 // buffer control
 #define PIN_SWD_EN_PORT         (0U)
-#define PIN_SWD_EN              (13U)
+#define PIN_SWD_EN              (24U)
 #define PIN_SWD_EN_MASK         (1U << PIN_SWD_EN)
 
 #define PIN_UART_EN_PORT        (0U)
 #define PIN_UART_EN             (7U)
 #define PIN_UART_EN_MASK        (1U << PIN_UART_EN)
 
+#define PIN_SPI_EN_PORT         (0U)
+#define PIN_SPI_EN              (28U)
+#define PIN_SPI_EN_MASK         (1U << PIN_SPI_EN)
+
 // active low UART status LED
 #define PIN_UART_STATUS_LED_PORT   (0U)
-#define PIN_UART_STATUS_LED        (21U)
+#define PIN_UART_STATUS_LED        (17U)
 #define PIN_UART_STATUS_LED_MASK   (1U << PIN_UART_STATUS_LED)
 
 // active low SWD status LED
 #define PIN_SWD_STATUS_LED_PORT    (0U)
-#define PIN_SWD_STATUS_LED         (22U)
+#define PIN_SWD_STATUS_LED         (1U)
 #define PIN_SWD_STATUS_LED_MASK    (1U << PIN_SWD_STATUS_LED)
 
 // active low UC status LED
 #define PIN_UC_STATUS_LED_PORT     (0U)
-#define PIN_UC_STATUS_LED          (9U)
+#define PIN_UC_STATUS_LED          (27U)
 #define PIN_UC_STATUS_LED_MASK     (1U << PIN_UC_STATUS_LED)
 
 // analog inputs
 #define PIN_VREF_TARGET_SWD_PORT   (0U)
-#define PIN_VREF_TARGET_SWD        (15U)
+#define PIN_VREF_TARGET_SWD        (16U)
 #define PIN_VREF_TARGET_SWD_MASK   (1U << PIN_VREF_TARGET_SWD)
 #define PIN_VREF_TARGET_UART_PORT  (0U)
-#define PIN_VREF_TARGET_UART       (16U)
+#define PIN_VREF_TARGET_UART       (15U)
 #define PIN_VREF_TARGET_UART_MASK  (1U << PIN_VREF_TARGET_UART)
+#define PIN_VREF_TARGET_SPI_PORT   (0U)
+#define PIN_VREF_TARGET_SPI        (23U)
+#define PIN_VREF_TARGET_SPI_MASK   (1U << PIN_VREF_TARGET_UART)
 
 // testing SPI
 #define PIN_SPI_SCK_PORT  (0U)
@@ -140,15 +146,15 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 #define PIN_SPI_MISO_MASK (1U << PIN_SPI_MISO)
 
 #define PIN_SPI_CS_L_PORT (0U)
-#define PIN_SPI_CS_L      PIN_TCK_SWCLK
+#define PIN_SPI_CS_L      (25U)
 #define PIN_SPI_CS_L_MASK (1U << PIN_SPI_CS_L)
 
 #define PIN_SPI_CDONE_PORT (0U)
-#define PIN_SPI_CDONE      PIN_TMS_SWDIO
+#define PIN_SPI_CDONE      (9U)
 #define PIN_SPI_CDONE_MASK (1U << PIN_SPI_CDONE)
 
 #define PIN_SPI_CRESET_PORT (0U)
-#define PIN_SPI_CRESET      PIN_TDI
+#define PIN_SPI_CRESET      (18U)
 #define PIN_SPI_CRESET_MASK (1U << PIN_SPI_CRESET)
 
 
