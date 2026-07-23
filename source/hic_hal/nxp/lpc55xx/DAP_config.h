@@ -574,12 +574,14 @@ __STATIC_INLINE void DAP_SETUP(void)
             .modefunc = IOCON_FUNC0
                       | IOCON_SLEW_STANDARD
                       | IOCON_DIGITAL_EN
+                      | IOCON_GPIO_MODE // I2C pins are special
         },
         {
             .port = PIN_PIO_PORT,
             .pin = PIN_RESET_IN,
             .modefunc = IOCON_FUNC0
                       | IOCON_DIGITAL_EN
+                      | IOCON_GPIO_MODE // I2C pins are special
         },
         {
             .port = PIN_SPI_CS_L_PORT,
