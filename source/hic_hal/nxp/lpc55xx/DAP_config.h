@@ -598,6 +598,13 @@ __STATIC_INLINE void DAP_SETUP(void)
                       | IOCON_DIGITAL_EN
         },
         {
+            .port = PIN_SPI_EN_PORT,
+            .pin = PIN_SPI_EN,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_SLEW_STANDARD
+                      | IOCON_DIGITAL_EN
+        },
+        {
             .port = PIN_SPI_CDONE_PORT,
             .pin = PIN_SPI_CDONE,
             .modefunc = IOCON_FUNC0
@@ -622,6 +629,27 @@ __STATIC_INLINE void DAP_SETUP(void)
             .pin = PIN_SPI_MISO,
             .modefunc = IOCON_FUNC7
                       | IOCON_DIGITAL_EN
+        },
+        {
+            .port = PIN_VREF_TARGET_SPI_PORT,
+            .pin = PIN_VREF_TARGET_SPI,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_ANALOG_EN
+                      | IOCON_AWS_EN
+        },
+        {
+            .port = PIN_VREF_TARGET_UART_PORT,
+            .pin = PIN_VREF_TARGET_UART,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_ANALOG_EN
+                      | IOCON_AWS_EN
+        },
+        {
+            .port = PIN_VREF_TARGET_SWD_PORT,
+            .pin = PIN_VREF_TARGET_SWD,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_ANALOG_EN
+                      | IOCON_AWS_EN
         },
         {
             .port = PIN_UART_STATUS_LED_PORT,
@@ -675,7 +703,10 @@ __STATIC_INLINE void DAP_SETUP(void)
     // set inputs
     GPIO->DIRCLR[PIN_PIO_PORT] = PIN_SPI_CDONE_MASK
                                | PIN_RESET_IN_MASK
-                               | PIN_TMS_SWDIO_MASK;
+                               | PIN_TMS_SWDIO_MASK
+                               | PIN_VREF_TARGET_SPI
+                               | PIN_VREF_TARGET_SWD
+                               | PIN_VREF_TARGET_UART;
 
     spi_master_config_t userConfig;
     userConfig.baudRate_Bps = 1000000;

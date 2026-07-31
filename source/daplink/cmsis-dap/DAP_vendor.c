@@ -55,6 +55,7 @@ static const uint32_t file_stream_buffer_size = sizeof(usb_buffer);
 static uint16_t file_stream_buffer_pos = 0;
 #endif
 
+extern bool board_get_adc_values(uint16_t *values);
 extern void PIN_SPI_CS_L_SET(bool v);
 extern void PIN_SPI_CRESET_SET(bool v);
 extern uint32_t PIN_SPI_CDONE_IN(void);
@@ -263,7 +264,15 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         num += (((uint16_t)len + 1U) << 16) | 1U + len; // increment request and response count each by 1
         break;
     }
-    case ID_DAP_Vendor18: break;
+    case ID_DAP_Vendor18: {
+        uint16_t results[3] = {0};
+        board_get_adc_values(results);
+        for (int i=0; i<sizeof(results); i++) {
+            response[i] = ((uint8_t*)results)[i];
+        }
+        num += sizeof(results); // add to the response length
+        break;
+    }
     case ID_DAP_Vendor19: break;
     case ID_DAP_Vendor20: break;
     case ID_DAP_Vendor21: break;
