@@ -59,10 +59,14 @@ extern bool board_get_adc_values(uint16_t *values);
 extern void PIN_SPI_CS_L_SET(bool v);
 extern void PIN_SPI_CRESET_SET(bool v);
 extern uint32_t PIN_SPI_CDONE_IN(void);
+extern uint32_t EraseSector(uint32_t);
 
 #define SPI_RESET (1 << 0)
 #define SPI_CS_L (1 << 1)
+// TODO rename status
 #define SPI_CDONE (1 << 4)
+const uint32_t OXDAP_VER = 1;
+const uint8_t OXDAP_ERASE_KEY[] = { 0xDE, 0xAD, 0xBE, 0xEF };
 
 //**************************************************************************************************
 /**
@@ -237,6 +241,7 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
     }
     case ID_DAP_Vendor14: break;
     case ID_DAP_Vendor15: break;
+    // gpio control
     case ID_DAP_Vendor16: {
         // expects a byte. top 4 bits are mask, bottom are value to set pin to
         // if mask is set. returns state of CDONE in a single byte
@@ -252,6 +257,7 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         num += (1U << 16) | 1U; // increment request and response count each by 1
         break;
     }
+    // spi transfer
     case ID_DAP_Vendor17: {
         // expects a byte length and then that many bytes of data
         const uint8_t len = *request++;
@@ -264,7 +270,9 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         num += (((uint16_t)len + 1U) << 16) | 1U + len; // increment request and response count each by 1
         break;
     }
+    // analog read
     case ID_DAP_Vendor18: {
+        // outputs 3 16-bit analog values
         uint16_t results[3] = {0};
         board_get_adc_values(results);
         for (int i=0; i<sizeof(results); i++) {
@@ -273,8 +281,21 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         num += sizeof(results); // add to the response length
         break;
     }
+    // barback info
     case ID_DAP_Vendor19: break;
-    case ID_DAP_Vendor20: break;
+    // barback erase
+    case ID_DAP_Vendor20: {
+        int32_t result = -1;
+        if (!memcmp(OXDAP_ERASE_KEY, request, sizeof(OXDAP_ERASE_KEY))) {
+            result = EraseSector(0);
+        }
+        response[0] = (result >> 0)  & 0xFF;
+        response[1] = (result >> 8)  & 0xFF;
+        response[2] = (result >> 16) & 0xFF;
+        response[3] = (result >> 24) & 0xFF;
+        num += sizeof(result); // add to the response length
+        break;
+    }
     case ID_DAP_Vendor21: break;
     case ID_DAP_Vendor22: break;
     case ID_DAP_Vendor23: break;
