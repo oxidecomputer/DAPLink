@@ -42,6 +42,7 @@
 #include <string.h>
 #include "daplink_vendor_commands.h"
 #include "fsl_spi.h"
+#include "version_git.h"
 #include "fsl_device_registers.h"
 
 #ifdef DRAG_N_DROP_SUPPORT
@@ -60,12 +61,15 @@ extern void PIN_SPI_CS_L_SET(bool v);
 extern void PIN_SPI_CRESET_SET(bool v);
 extern uint32_t PIN_SPI_CDONE_IN(void);
 extern uint32_t EraseSector(uint32_t);
+extern uint8_t read_board_probe_id();
+extern uint8_t read_board_hcv();
 
 #define SPI_RESET (1 << 0)
 #define SPI_CS_L (1 << 1)
 // TODO rename status
 #define SPI_CDONE (1 << 4)
-const uint32_t OXDAP_VER = 1;
+const uint8_t OXDAP_VER = 1;
+const uint8_t OXDAP_BOARD = 1; // 0 oxlink, 1 barback, ...
 const uint8_t OXDAP_ERASE_KEY[] = { 0xDE, 0xAD, 0xBE, 0xEF };
 
 //**************************************************************************************************
@@ -281,9 +285,16 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         num += sizeof(results); // add to the response length
         break;
     }
-    // barback info
-    case ID_DAP_Vendor19: break;
-    // barback erase
+    // probe info
+    case ID_DAP_Vendor19: {
+        response[0] = OXDAP_VER;
+        response[1] = OXDAP_BOARD;
+        response[2] = read_board_hcv();
+        response[3] = read_board_probe_id();
+        num += 4; // explicit response length
+        break;
+    }
+    // probe erase
     case ID_DAP_Vendor20: {
         int32_t result = -1;
         if (!memcmp(OXDAP_ERASE_KEY, request, sizeof(OXDAP_ERASE_KEY))) {
@@ -296,7 +307,15 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         num += sizeof(result); // add to the response length
         break;
     }
-    case ID_DAP_Vendor21: break;
+    // probe fw commit
+    case ID_DAP_Vendor21: {
+        uint8_t ver_len = sizeof(GIT_COMMIT_SHA) - 1;
+        response[0] = GIT_LOCAL_MODS;
+        response[1] = ver_len;
+        memcpy(&response[2], GIT_COMMIT_SHA, ver_len);
+        num += 2 + ver_len;
+        break;
+    }
     case ID_DAP_Vendor22: break;
     case ID_DAP_Vendor23: break;
     case ID_DAP_Vendor24: break;

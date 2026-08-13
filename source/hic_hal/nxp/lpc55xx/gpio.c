@@ -127,6 +127,25 @@ void board_adc_init() {
   LPADC_SetConvTriggerConfig(ADC0, 0, &adc_trig_cfg); // using trigger 0
 }
 
+// get the hardware compatibility version of the board
+uint8_t read_board_hcv() {
+    uint8_t version = 0;
+    version |= GPIO->B[PIN_HCV0_PORT][PIN_HCV0] << 0;
+    version |= GPIO->B[PIN_HCV1_PORT][PIN_HCV1] << 1;
+    version |= GPIO->B[PIN_HCV2_PORT][PIN_HCV2] << 2;
+    return version;
+}
+
+// get probe id from the board. differentiates probes on the same board
+// 0 = standalone
+// 1 = Barback - RoT
+// 2 = Barback - SP
+uint8_t read_board_probe_id() {
+    uint8_t probe_id = 0;
+    probe_id = GPIO->B[PIN_PROBE_ID_PORT][PIN_PROBE_ID] + 1;
+    return probe_id;
+}
+
 // the adc is in 12 bit mode so, per the datahseet, the format of a result is
 //
 // 0###_####_####_#000

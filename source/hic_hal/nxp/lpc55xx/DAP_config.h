@@ -669,6 +669,30 @@ __STATIC_INLINE void DAP_SETUP(void)
             .modefunc = IOCON_FUNC0
                       | IOCON_DIGITAL_EN
         },
+        {
+            .port = PIN_HCV0_PORT,
+            .pin = PIN_HCV0,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_DIGITAL_EN
+        },
+        {
+            .port = PIN_HCV1_PORT,
+            .pin = PIN_HCV1,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_DIGITAL_EN
+        },
+        {
+            .port = PIN_HCV2_PORT,
+            .pin = PIN_HCV2,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_DIGITAL_EN
+        },
+        {
+            .port = PIN_PROBE_ID_PORT,
+            .pin = PIN_PROBE_ID,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_DIGITAL_EN
+        },
     };
 
     IOCON_SetPinMuxing(IOCON, kPinConfigs, ARRAY_SIZE(kPinConfigs));
