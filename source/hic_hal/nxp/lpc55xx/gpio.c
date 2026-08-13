@@ -128,7 +128,7 @@ void board_adc_init() {
 }
 
 // get the hardware compatibility version of the board
-uint8_t read_board_hcv() {
+uint8_t board_hcv_read() {
     uint8_t version = 0;
     version |= GPIO->B[PIN_HCV0_PORT][PIN_HCV0] << 0;
     version |= GPIO->B[PIN_HCV1_PORT][PIN_HCV1] << 1;
@@ -140,10 +140,51 @@ uint8_t read_board_hcv() {
 // 0 = standalone
 // 1 = Barback - RoT
 // 2 = Barback - SP
-uint8_t read_board_probe_id() {
+uint8_t board_probe_id_read() {
     uint8_t probe_id = 0;
     probe_id = GPIO->B[PIN_PROBE_ID_PORT][PIN_PROBE_ID] + 1;
     return probe_id;
+}
+
+#define SPI_RESET_L (1 << 0)
+#define SPI_CS_L (1 << 1)
+uint32_t board_gpio_out_read() {
+    uint32_t result = 0;
+    if (GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET]) {
+        result |= SPI_RESET_L;
+    }
+    if (GPIO->B[PIN_SPI_CS_L_PORT][PIN_SPI_CS_L]) {
+        result |= SPI_CS_L;
+    }
+    return result;
+}
+
+// TODO rename status
+#define SPI_CDONE (1 << 0)
+uint32_t board_gpio_in_read() {
+    uint32_t result = 0;
+    if (GPIO->B[PIN_SPI_CDONE_PORT][PIN_SPI_CDONE]) {
+        result |= SPI_CDONE;
+    }
+    return result;
+}
+
+void board_gpio_out_write(uint32_t mask, uint32_t values) {
+    // for better or worse we tie the output enable to the reset line control
+    // so we can't accidentally backdrive the fpga I/O lines
+    if (mask & SPI_RESET_L) {
+        if (values & SPI_RESET_L) {
+            GPIO->B[PIN_SPI_EN_PORT][PIN_SPI_EN] = 0;
+            GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET] = 1;
+        } else {
+            GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET] = 0;
+            GPIO->B[PIN_SPI_EN_PORT][PIN_SPI_EN] = 1;
+        }
+    }
+    if (mask & SPI_CS_L) {
+        GPIO->B[PIN_SPI_CS_L_PORT][PIN_SPI_CS_L] =
+            values & SPI_CS_L ? 1 : 0;
+    }
 }
 
 // the adc is in 12 bit mode so, per the datahseet, the format of a result is
@@ -165,7 +206,7 @@ uint16_t result_to_millivolts(uint16_t result) {
 }
 
 // TODO we need a better output structure!
-bool board_get_adc_values(uint16_t *values) {
+bool board_adc_values_get(uint16_t *values) {
     // must be same order as channel chain!
   uint32_t channels[] = {
     VREF_TARGET_SPI_HALF_CMD,

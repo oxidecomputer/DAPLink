@@ -56,18 +56,17 @@ static const uint32_t file_stream_buffer_size = sizeof(usb_buffer);
 static uint16_t file_stream_buffer_pos = 0;
 #endif
 
-extern bool board_get_adc_values(uint16_t *values);
+extern bool board_adc_values_get(uint16_t *values);
 extern void PIN_SPI_CS_L_SET(bool v);
 extern void PIN_SPI_CRESET_SET(bool v);
 extern uint32_t PIN_SPI_CDONE_IN(void);
 extern uint32_t EraseSector(uint32_t);
-extern uint8_t read_board_probe_id();
-extern uint8_t read_board_hcv();
+extern uint8_t board_probe_id_read();
+extern uint8_t board_hcv_read();
+extern void board_gpio_out_write(uint32_t, uint32_t);
+extern uint32_t board_gpio_in_read();
+extern uint32_t board_gpio_out_read();
 
-#define SPI_RESET (1 << 0)
-#define SPI_CS_L (1 << 1)
-// TODO rename status
-#define SPI_CDONE (1 << 4)
 const uint8_t OXDAP_VER = 1;
 const uint8_t OXDAP_BOARD = 1; // 0 oxlink, 1 barback, ...
 const uint8_t OXDAP_ERASE_KEY[] = { 0xDE, 0xAD, 0xBE, 0xEF };
@@ -247,18 +246,36 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
     case ID_DAP_Vendor15: break;
     // gpio control
     case ID_DAP_Vendor16: {
-        // expects a byte. top 4 bits are mask, bottom are value to set pin to
-        // if mask is set. returns state of CDONE in a single byte
-        const uint8_t mask = (*request >> 4) & 0xF;
-        const uint8_t cmd = *request & 0xF;
-        if (mask & SPI_CS_L) {
-            PIN_SPI_CS_L_SET(cmd & SPI_CS_L);
-        }
-        if (mask & SPI_RESET) {
-            PIN_SPI_CRESET_SET(cmd & SPI_RESET);
-        }
-        *response = PIN_SPI_CDONE_IN() ? SPI_CDONE : 0;
-        num += (1U << 16) | 1U; // increment request and response count each by 1
+        // encoding is little endian. 1 is high at external interface (there
+        // may be buffers or inverters in board circuitry, this is after those)
+        //
+        // expects
+        // u32 mask (1 means output will be set)
+        // u32 outputs
+        //
+        // return
+        // u32 inputs
+        // u32 outputs
+        uint32_t mask = request[0];
+        mask |= ((uint32_t)request[1]) << 8;
+        mask |= ((uint32_t)request[2]) << 16;
+        mask |= ((uint32_t)request[3]) << 24;
+        uint32_t values = request[4];
+        values |= ((uint32_t)request[5]) << 8;
+        values |= ((uint32_t)request[6]) << 16;
+        values |= ((uint32_t)request[7]) << 24;
+        board_gpio_out_write(mask, values);
+        uint32_t result = board_gpio_in_read();
+        response[0] = (result >> 0) & 0xFF;
+        response[1] = (result >> 8) & 0xFF;
+        response[2] = (result >> 16) & 0xFF;
+        response[3] = (result >> 24) & 0xFF;
+        result = board_gpio_out_read();
+        response[4] = (result >> 0) & 0xFF;
+        response[5] = (result >> 8) & 0xFF;
+        response[6] = (result >> 16) & 0xFF;
+        response[7] = (result >> 24) & 0xFF;
+        num += 8; // increment request and response count each by 1
         break;
     }
     // spi transfer
@@ -278,7 +295,7 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
     case ID_DAP_Vendor18: {
         // outputs 3 16-bit analog values
         uint16_t results[3] = {0};
-        board_get_adc_values(results);
+        board_adc_values_get(results);
         for (int i=0; i<sizeof(results); i++) {
             response[i] = ((uint8_t*)results)[i];
         }
@@ -289,8 +306,8 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
     case ID_DAP_Vendor19: {
         response[0] = OXDAP_VER;
         response[1] = OXDAP_BOARD;
-        response[2] = read_board_hcv();
-        response[3] = read_board_probe_id();
+        response[2] = board_hcv_read();
+        response[3] = board_probe_id_read();
         num += 4; // explicit response length
         break;
     }

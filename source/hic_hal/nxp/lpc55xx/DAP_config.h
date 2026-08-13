@@ -269,30 +269,6 @@ __STATIC_INLINE void PORT_OFF(void)
 
 }
 
-__STATIC_FORCEINLINE void PIN_SPI_CS_L_SET(bool v)
-{
-    GPIO->B[PIN_SPI_CS_L_PORT][PIN_SPI_CS_L] = v ? 1 : 0;
-}
-
-__STATIC_FORCEINLINE void PIN_SPI_CRESET_SET(bool v)
-{
-
-  // currently tailored for ICE40 operations
-  if (v) {
-        // deassert reset
-        GPIO->B[PIN_SPI_EN_PORT][PIN_SPI_EN] = 0; // disable output buffers
-        GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET] = 1; // exit reset last
-  } else {
-        GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET] = 0; // reset first
-        GPIO->B[PIN_SPI_EN_PORT][PIN_SPI_EN] = 1; // enable output buffers
-  }
-}
-
-__STATIC_FORCEINLINE uint32_t PIN_SPI_CDONE_IN(void)
-{
-    return GPIO->B[PIN_SPI_CDONE_PORT][PIN_SPI_CDONE];
-}
-
 /** SWCLK/TCK I/O pin: Get Input.
 \return Current status of the SWCLK/TCK DAP hardware I/O pin.
 */
