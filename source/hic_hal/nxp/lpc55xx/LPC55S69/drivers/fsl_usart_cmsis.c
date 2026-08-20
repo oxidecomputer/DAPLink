@@ -431,8 +431,21 @@ static int32_t USART_DmaGetTxCount(cmsis_usart_dma_driver_state_t *usart)
 
 static int32_t USART_DmaGetRxCount(cmsis_usart_dma_driver_state_t *usart)
 {
-    /* Does not support */
-    return ARM_DRIVER_ERROR;
+    uint32_t cnt;
+
+    /* USART_TransferGetReceiveCountDMA() reports kStatus_NoTransferInProgress
+     * once the transfer has fully completed and the RxIdle callback has
+     * already fired; in that case the whole request has been received. */
+    if (kUSART_RxIdle == usart->handle->rxState)
+    {
+        cnt = usart->handle->rxDataSizeAll;
+    }
+    else
+    {
+        (void)USART_TransferGetReceiveCountDMA(usart->resource->base, usart->handle, &cnt);
+    }
+
+    return (int32_t)cnt;
 }
 
 static int32_t USART_DmaControl(uint32_t control, uint32_t arg, cmsis_usart_dma_driver_state_t *usart)
@@ -444,7 +457,7 @@ static int32_t USART_DmaControl(uint32_t control, uint32_t arg, cmsis_usart_dma_
     }
 
     /* Does not support these features. */
-    if (control & (ARM_USART_FLOW_CONTROL_Msk | ARM_USART_CPOL_Msk | ARM_USART_CPHA_Msk))
+    if (control & (ARM_USART_CPOL_Msk | ARM_USART_CPHA_Msk))
     {
         return ARM_DRIVER_ERROR_UNSUPPORTED;
     }

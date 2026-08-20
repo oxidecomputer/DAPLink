@@ -13,7 +13,7 @@
 /* User needs to provide the implementation for XXX_GetFreq/XXX_InitPins/XXX_DeinitPins 
 in the application for enabling according instance. */ 
 #define RTE_USART0 1
-#define RTE_USART0_DMA_EN 0
+#define RTE_USART0_DMA_EN 1
 #define RTE_USART1 0
 #define RTE_USART1_DMA_EN 0
 #define RTE_USART2 0
