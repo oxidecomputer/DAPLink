@@ -277,8 +277,18 @@ int32_t uart_write_data(uint8_t *data, uint16_t size)
 // section (either explicitly, or by virtue of running inside uart_handler()).
 static void uart_rx_start_chunk(void)
 {
-    dma_rx_flushed = 0;
-    USART_INSTANCE.Receive(dma_rx_chunk, sizeof(dma_rx_chunk));
+    // Receive() fails with ARM_DRIVER_ERROR_BUSY if the USART DMA driver's
+    // rxState hasn't reached RxIdle yet -- which happens when this chunk's
+    // completion interrupt is still pending behind our caller's IRQ mask,
+    // even though the transfer itself finished in hardware. In that case no
+    // new transfer was actually armed, so dma_rx_flushed must be left as-is
+    // (still marking this chunk fully flushed): resetting it to 0 here would
+    // make the retry -- once the pending completion interrupt actually runs
+    // and calls back into here -- recopy this whole chunk into read_buffer
+    // a second time, duplicating already-sent bytes.
+    if (USART_INSTANCE.Receive(dma_rx_chunk, sizeof(dma_rx_chunk)) == ARM_DRIVER_OK) {
+        dma_rx_flushed = 0;
+    }
 }
 
 // Copies any bytes that have arrived in the in-flight DMA RX chunk into
