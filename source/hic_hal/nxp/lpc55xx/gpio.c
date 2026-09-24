@@ -148,6 +148,7 @@ uint8_t board_probe_id_read() {
 
 #define SPI_RESET_L (1 << 0)
 #define SPI_CS_L (1 << 1)
+#define SPI_OE (1 << 2)
 uint32_t board_gpio_out_read() {
     uint32_t result = 0;
     if (GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET]) {
@@ -155,6 +156,9 @@ uint32_t board_gpio_out_read() {
     }
     if (GPIO->B[PIN_SPI_CS_L_PORT][PIN_SPI_CS_L]) {
         result |= SPI_CS_L;
+    }
+    if (GPIO->B[PIN_SPI_EN_PORT][PIN_SPI_EN]) {
+        result |= SPI_OE;
     }
     return result;
 }
@@ -170,20 +174,18 @@ uint32_t board_gpio_in_read() {
 }
 
 void board_gpio_out_write(uint32_t mask, uint32_t values) {
-    // for better or worse we tie the output enable to the reset line control
-    // so we can't accidentally backdrive the fpga I/O lines
     if (mask & SPI_RESET_L) {
-        if (values & SPI_RESET_L) {
-            GPIO->B[PIN_SPI_EN_PORT][PIN_SPI_EN] = 0;
-            GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET] = 1;
-        } else {
-            GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET] = 0;
-            GPIO->B[PIN_SPI_EN_PORT][PIN_SPI_EN] = 1;
-        }
+        GPIO->B[PIN_SPI_CRESET_PORT][PIN_SPI_CRESET] =
+            values & SPI_RESET_L ? 1 : 0;
     }
     if (mask & SPI_CS_L) {
         GPIO->B[PIN_SPI_CS_L_PORT][PIN_SPI_CS_L] =
             values & SPI_CS_L ? 1 : 0;
+    }
+    // TODO Only allow OE assert if SPI_RESET_L is asserted
+    if (mask & SPI_OE) {
+        GPIO->B[PIN_SPI_EN_PORT][PIN_SPI_EN] =
+            values & SPI_OE ? 1 : 0;
     }
 }
 
