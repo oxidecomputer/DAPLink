@@ -133,6 +133,9 @@ uint8_t board_hcv_read() {
     version |= GPIO->B[PIN_HCV0_PORT][PIN_HCV0] << 0;
     version |= GPIO->B[PIN_HCV1_PORT][PIN_HCV1] << 1;
     version |= GPIO->B[PIN_HCV2_PORT][PIN_HCV2] << 2;
+    // barback mistakenly started with PIN_HCV0 at 1 so we subract 1 from all
+    // calculated HCV values
+    version -= 1;
     return version;
 }
 
