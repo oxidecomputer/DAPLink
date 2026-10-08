@@ -254,15 +254,14 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
         break;
     }
     // analog read
-    // TODO we should support this!
     case ID_DAP_Vendor18: {
         // outputs 3 16-bit analog values
-        //uint16_t results[3] = {0};
-        //board_adc_values_get(results);
-        //for (int i=0; i<sizeof(results); i++) {
-        //    response[i] = ((uint8_t*)results)[i];
-        //}
-        //num += sizeof(results); // add to the response length
+        uint16_t results[3] = {0};
+        board_adc_values_get(results);
+        for (int i=0; i<sizeof(results); i++) {
+            response[i] = ((uint8_t*)results)[i];
+        }
+        num += sizeof(results); // add to the response length
         break;
     }
     // probe info
