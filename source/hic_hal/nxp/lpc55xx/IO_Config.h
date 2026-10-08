@@ -126,6 +126,19 @@ COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_LPC55XX);
 #define PIN_VREF_TARGET_UART       (16U)
 #define PIN_VREF_TARGET_UART_MASK  (1U << PIN_VREF_TARGET_UART)
 
+// HCV pins
+#define PIN_HCV0_PORT (1U)
+#define PIN_HCV0      (1U)
+#define PIN_HCV0_MASK (1U << PIN_HCV0)
+
+#define PIN_HCV1_PORT (1U)
+#define PIN_HCV1      (2U)
+#define PIN_HCV1_MASK (1U << PIN_HCV1)
+
+#define PIN_HCV2_PORT (1U)
+#define PIN_HCV2      (3U)
+#define PIN_HCV2_MASK (1U << PIN_HCV2)
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Additional configuration for MCU-LINK-PRO support
 //////////////////////////////////////////////////////////////////////////////////////////////////

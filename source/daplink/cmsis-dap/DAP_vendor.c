@@ -41,6 +41,8 @@
 #include "util.h"
 #include <string.h>
 #include "daplink_vendor_commands.h"
+#include "version_git.h"
+#include "fsl_device_registers.h"
 
 #ifdef DRAG_N_DROP_SUPPORT
 #include "file_stream.h"
@@ -52,6 +54,21 @@ static uint8_t *file_stream_buffer = (uint8_t *)usb_buffer;
 static const uint32_t file_stream_buffer_size = sizeof(usb_buffer);
 static uint16_t file_stream_buffer_pos = 0;
 #endif
+
+extern bool board_adc_values_get(uint16_t *values);
+extern void PIN_SPI_CS_L_SET(bool v);
+extern void PIN_SPI_CRESET_SET(bool v);
+extern uint32_t PIN_SPI_CDONE_IN(void);
+extern uint32_t EraseSector(uint32_t);
+extern uint8_t board_probe_id_read();
+extern uint8_t board_hcv_read();
+extern void board_gpio_out_write(uint32_t, uint32_t);
+extern uint32_t board_gpio_in_read();
+extern uint32_t board_gpio_out_read();
+
+const uint8_t OXDAP_VER = 1;
+const uint8_t OXDAP_BOARD = 0; // 0 oxlink, 1 barback, ...
+const uint8_t OXDAP_ERASE_KEY[] = { 0xDE, 0xAD, 0xBE, 0xEF };
 
 //**************************************************************************************************
 /**
@@ -226,12 +243,59 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
     }
     case ID_DAP_Vendor14: break;
     case ID_DAP_Vendor15: break;
-    case ID_DAP_Vendor16: break;
-    case ID_DAP_Vendor17: break;
-    case ID_DAP_Vendor18: break;
-    case ID_DAP_Vendor19: break;
-    case ID_DAP_Vendor20: break;
-    case ID_DAP_Vendor21: break;
+    // gpio control
+    case ID_DAP_Vendor16: {
+        // currently not supported on oxlink
+        break;
+    }
+    // spi transfer
+    case ID_DAP_Vendor17: {
+        // currently not supported on oxlink
+        break;
+    }
+    // analog read
+    // TODO we should support this!
+    case ID_DAP_Vendor18: {
+        // outputs 3 16-bit analog values
+        //uint16_t results[3] = {0};
+        //board_adc_values_get(results);
+        //for (int i=0; i<sizeof(results); i++) {
+        //    response[i] = ((uint8_t*)results)[i];
+        //}
+        //num += sizeof(results); // add to the response length
+        break;
+    }
+    // probe info
+    case ID_DAP_Vendor19: {
+        response[0] = OXDAP_VER;
+        response[1] = OXDAP_BOARD;
+        response[2] = board_hcv_read();
+        response[3] = board_probe_id_read();
+        num += 4; // explicit response length
+        break;
+    }
+    // probe erase
+    case ID_DAP_Vendor20: {
+        int32_t result = -1;
+        if (!memcmp(OXDAP_ERASE_KEY, request, sizeof(OXDAP_ERASE_KEY))) {
+            result = EraseSector(0);
+        }
+        response[0] = (result >> 0)  & 0xFF;
+        response[1] = (result >> 8)  & 0xFF;
+        response[2] = (result >> 16) & 0xFF;
+        response[3] = (result >> 24) & 0xFF;
+        num += sizeof(result); // add to the response length
+        break;
+    }
+    // probe fw commit
+    case ID_DAP_Vendor21: {
+        uint8_t ver_len = sizeof(GIT_COMMIT_SHA) - 1;
+        response[0] = GIT_LOCAL_MODS;
+        response[1] = ver_len;
+        memcpy(&response[2], GIT_COMMIT_SHA, ver_len);
+        num += 2 + ver_len;
+        break;
+    }
     case ID_DAP_Vendor22: break;
     case ID_DAP_Vendor23: break;
     case ID_DAP_Vendor24: break;

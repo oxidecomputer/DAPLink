@@ -63,6 +63,20 @@ void gpio_set_board_power(bool powerEnabled) {
   // No target power control in this circuit.
 }
 
+// get the hardware compatibility version of the board
+uint8_t board_hcv_read() {
+    uint8_t version = 0;
+    version |= GPIO->B[PIN_HCV0_PORT][PIN_HCV0] << 0;
+    version |= GPIO->B[PIN_HCV1_PORT][PIN_HCV1] << 1;
+    version |= GPIO->B[PIN_HCV2_PORT][PIN_HCV2] << 2;
+    return version;
+}
+
+// oxlink only has one probe on the board so we just return 0
+uint8_t board_probe_id_read() {
+    return 0;
+}
+
 // TODO check the logic here, each field needs to be mapped to the correct LED
 __WEAK void gpio_set_leds(uint32_t leds, gpio_led_state_t state) {
   // LED is active low, so set to inverse of the enum value.

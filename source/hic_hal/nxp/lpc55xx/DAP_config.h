@@ -583,12 +583,34 @@ __STATIC_INLINE void DAP_SETUP(void)
         {
             .port = PIN_VREF_TARGET_UART_PORT,
             .pin = PIN_VREF_TARGET_UART,
-            .modefunc = IOCON_FUNC0 | IOCON_MODE_INACT// TODO IOCON_ANALOG_EN
+            .modefunc = IOCON_FUNC0
+                      | IOCON_ANALOG_EN
+                      | IOCON_AWS_EN
         },
         {
             .port = PIN_VREF_TARGET_SWD_PORT,
             .pin = PIN_VREF_TARGET_SWD,
-            .modefunc = IOCON_FUNC0 | IOCON_MODE_INACT // TODO IOCON_ANALOG_EN |
+            .modefunc = IOCON_FUNC0
+                      | IOCON_ANALOG_EN
+                      | IOCON_AWS_EN
+        },
+        {
+            .port = PIN_HCV0_PORT,
+            .pin = PIN_HCV0,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_DIGITAL_EN
+        },
+        {
+            .port = PIN_HCV1_PORT,
+            .pin = PIN_HCV1,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_DIGITAL_EN
+        },
+        {
+            .port = PIN_HCV2_PORT,
+            .pin = PIN_HCV2,
+            .modefunc = IOCON_FUNC0
+                      | IOCON_DIGITAL_EN
         },
     };
 
